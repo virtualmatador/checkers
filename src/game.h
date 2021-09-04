@@ -19,6 +19,7 @@ namespace main
         void Escape() override;
 
     private:
+        void set_preferences();
         void update_view();
         void give_up();
         void game_over();

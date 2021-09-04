@@ -139,18 +139,27 @@ body > div:last-child
     bottom: 0;
     right: 0;
     content: '';
-    border-radius: calc(var(--vw) * 4);
-    box-shadow: 0 0 calc(var(--vw) * 2) black;
+    background-size: 100% 100%;
 }
 
-.cell[data-color="1"]::before
+.cell[data-color="bn"]::before
 {
-    background-color: lightgray;
+    background-image: url(pieces/bn.png);
 }
 
-.cell[data-color="2"]::before
+.cell[data-color="bq"]::before
 {
-    background-color: dimgray;
+    background-image: url(pieces/bq.png);
+}
+
+.cell[data-color="wn"]::before
+{
+    background-image: url(pieces/wn.png);
+}
+
+.cell[data-color="wq"]::before
+{
+    background-image: url(pieces/wq.png);
 }
 
 .cell[data-order]::after

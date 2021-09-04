@@ -1,3 +1,16 @@
+var alter_ = false;
+var rotate_ = false;
+
+function setAlter(alter)
+{
+    alter_ = alter;
+}
+
+function setRotate(rotate)
+{
+    rotate_ = rotate;
+}
+
 function newGame()
 {
     CallHandler("game", "reset", "");
@@ -52,27 +65,49 @@ window.onclick = function(event)
     }
 }
 
-function setSide(index, color)
+function setPiece(index, piece)
 {
-    var cell = document.getElementById('board').children[index];
-    if (color > 0)
+    var cell = document.getElementById('board').children[rotateIndex(index)];
+    switch (piece)
     {
-        cell.setAttribute('data-color', color);
-    }
-    else
-    {
+    case -2:
+        cell.setAttribute('data-color', alter_ ? 'wq' : 'bq');
+        break;
+    case -1:
+        cell.setAttribute('data-color', alter_ ? 'wn' : 'bn');
+        break;
+    case 0:
         cell.removeAttribute('data-color');
+        break;
+    case 1:
+        cell.setAttribute('data-color', alter_ ? 'bn' : 'wn');
+        break;
+    case 2:
+        cell.setAttribute('data-color', alter_ ? 'bq' : 'wq');
+        break;
     }
     cell.removeAttribute('data-order');
 }
 
 function setOrder(index, order)
 {
-    var cell = document.getElementById('board').children[index];
+    var cell = document.getElementById('board').children[rotateIndex(index)];
     cell.setAttribute('data-order', order);
 }
 
 function cellClick(cell)
 {
-    CallHandler("cell", "click", cell.getAttribute('data-index'));
+    CallHandler("cell", "click", rotateIndex(cell.getAttribute('data-index')));
+}
+
+function rotateIndex(index)
+{
+    if (rotate_)
+    {
+        return document.getElementById('board').children.length - 1 - index;
+    }
+    else
+    {
+        return index;
+    }
 }

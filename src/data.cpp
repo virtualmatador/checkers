@@ -55,6 +55,14 @@ void main::Data::load()
             toolbox::Load(composer.str().c_str(), buffer, false, false);
             board_.humans_.set(i, buffer);
         }
+        for (std::size_t i = 0; i < board_.queens_.size(); ++i)
+        {
+            std::ostringstream composer;
+            bool buffer;
+            composer << "GAME_QUEEN_" << i;
+            toolbox::Load(composer.str().c_str(), buffer, false, false);
+            board_.queens_.set(i, buffer);
+        }
     }
     catch(...)
     {
@@ -88,6 +96,12 @@ void main::Data::save() const
         composer << "GAME_HUMAN_" << i;
         toolbox::Save(composer.str().c_str(), board_.humans_.test(i));
     }
+    for (std::size_t i = 0; i < board_.queens_.size(); ++i)
+    {
+        std::ostringstream composer;
+        composer << "GAME_QUEEN_" << i;
+        toolbox::Save(composer.str().c_str(), board_.queens_.test(i));
+    }
 }
 
 void main::Data::reset_all()
@@ -106,17 +120,8 @@ void main::Data::reset_game()
     board_.score_ = 0;
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        if (i < 14)
-        {
-            data_.board_.set_state(i, 2);
-        }
-        else if (i > Board::cell_count_ - 1 - 14)
-        {
-            data_.board_.set_state(i, 1);
-        }
-        else
-        {
-            data_.board_.set_state(i, 0);
-        }
+        data_.board_.fulls_.set(i, i < 14 || i > Board::cell_count_ - 1 - 14);
+        data_.board_.humans_.set(i, i > Board::cell_count_ - 1 - 14);
+        data_.board_.queens_.set(i, false);
     }
 }

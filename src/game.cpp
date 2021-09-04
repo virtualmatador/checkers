@@ -17,6 +17,7 @@ main::Game::Game()
             return;
         else if (std::strcmp(command, "ready") == 0)
         {
+            set_preferences();
             update_view();
             game_over();
             if (data_.board_.level_ != 0)
@@ -76,8 +77,8 @@ main::Game::Game()
                 {
                     if (data_.moves_.empty())
                     {
-                        if (data_.board_.is_full(index) &&
-                            data_.board_.is_human(index))
+                        if (data_.board_.fulls_.test(index) &&
+                            data_.board_.humans_.test(index))
                         {
                             data_.moves_.emplace_back(index);
                         }
@@ -156,9 +157,9 @@ main::Game::Game()
                         }
                         else
                         {
-                            if (data_.board_.is_full(index))
+                            if (data_.board_.fulls_.test(index))
                             {
-                                if (data_.board_.is_human(index))
+                                if (data_.board_.humans_.test(index))
                                 {
                                     data_.moves_.clear();
                                     data_.moves_.emplace_back(index);
@@ -213,14 +214,28 @@ void main::Game::Escape()
     bridge::NeedRestart();
 }
 
+void main::Game::set_preferences()
+{
+    std::ostringstream js;
+    js.str("");
+    js.clear();
+    js << "setAlter(" << (data_.alter_ ? "true" : "false") << ");";
+    bridge::CallFunction(js.str().c_str());
+    js.str("");
+    js.clear();
+    js << "setRotate(" << (data_.rotate_ ? "true" : "false") << ");";
+    bridge::CallFunction(js.str().c_str());
+}
+
 void main::Game::update_view()
 {
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
+        int piece = (!data_.board_.fulls_.test(i) ? 0 :
+            data_.board_.humans_.test(i) ? 1 : -1) *
+            (data_.board_.queens_.test(i) ? 2 : 1);
         std::ostringstream js;
-        js << "setSide(" << i << "," <<
-            (data_.board_.is_full(i) ? data_.board_.is_human(i) ? 1 : 2 : 0) <<
-            ");";
+        js << "setPiece(" << i << "," << piece << ");";
         bridge::CallFunction(js.str().c_str());
     }
     for (std::size_t i = 0; i < data_.moves_.size(); ++i)
