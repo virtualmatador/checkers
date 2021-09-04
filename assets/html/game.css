@@ -1,0 +1,176 @@
+:root
+{
+    --vw: min(1vw, 1vh);
+}
+
+*
+{
+    user-select: none;
+}
+
+html, body
+{
+    height: 100%;
+    margin: 0;
+}
+
+body
+{
+    display: flex;
+    flex-flow: column;
+    background-color: slategray;
+    text-align: center;
+}
+
+body > div
+{
+    margin: auto;
+    min-width: calc(98 * var(--vw));
+}
+
+body > div > div
+{
+    margin-top: calc(1 * var(--vw));
+    margin-bottom: calc(1 * var(--vw));
+}
+
+body > div:not(last-child)
+{
+    flex: 0 1 auto;
+}
+
+body > div:last-child
+{
+    flex: 1 1 auto;
+}
+
+#menu
+{
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+
+#more
+{
+    width: calc(5 * var(--vw));
+    height: auto;
+}
+
+#options
+{
+    width: calc(var(--vw) * 20);
+    margin-top: calc(var(--vw) * 1.5);
+    border: calc(var(--vw) * 0.1) solid black;
+    border-radius: calc(var(--vw) * 2);
+    box-shadow: 0 0 calc(var(--vw) * 5) black;
+    font-size: calc(var(--vw) * 2);
+    display: none;
+    position: absolute;
+    z-index: 100;
+    right: 0pt;
+    background-color: mintcream;
+}
+
+#options > div
+{
+    cursor: default;
+    padding: calc(var(--vw) * 1.5);
+}
+
+#options > div:not(:first-child)
+{
+    border-top: calc(var(--vw) * 0.2) solid gray;
+}
+
+#gameover
+{
+    border: calc(0.15 * var(--vw)) solid black;
+    border-radius: calc(1 * var(--vw));
+    color: white;
+    font-size: calc(3 * var(--vw));
+    font-weight: bold;
+    width: calc(24 * var(--vw));
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#gameover[data-show="0"]
+{
+    display: none;
+}
+
+#gameover[data-show="1"]
+{
+    background-color: green;
+}
+
+#gameover[data-show="2"]
+{
+    background-color: red;
+}
+
+#board
+{
+    position: relative;
+}
+
+.cell
+{
+    width: calc(var(--vw) * (8 * 1.4143 - 0.25));
+    height: calc(var(--vw) * (8 * 1.4143 - 0.25));
+    border: calc(var(--vw) * 0.25) solid black;
+    top: calc(var(--vw) * 8 * var(--y));
+    left: calc(var(--vw) * 16 * (var(--x) + var(--shift) / 2));
+    position: absolute;
+    background-color: gray;
+    rotate: 45deg;
+}
+
+.cell[data-color]::before
+{
+    width: calc(var(--vw) * 8);
+    height: calc(var(--vw) * 8);
+    rotate: -45deg;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    content: '';
+    border-radius: calc(var(--vw) * 4);
+    box-shadow: 0 0 calc(var(--vw) * 2) black;
+}
+
+.cell[data-color="1"]::before
+{
+    background-color: lightgray;
+}
+
+.cell[data-color="2"]::before
+{
+    background-color: dimgray;
+}
+
+.cell[data-order]::after
+{
+    font-size: calc(var(--vw) * 4);
+    line-height: calc(var(--vw) * 8 * 1.4143);
+    rotate: -45deg;
+    position: absolute;
+    color: darkslategray;
+    font-weight: bold;
+    font-family: monospace;
+    content: attr(data-order);
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.cell[data-order="0"]::after
+{
+    content: '#';
+}

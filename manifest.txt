@@ -1,0 +1,4 @@
+target=Checkers
+identifier=com.shaidin.checkers
+version=1.0.0
+internet=false

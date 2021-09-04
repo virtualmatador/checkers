@@ -1,0 +1,12 @@
+[submodule "cross/desktop"]
+	path = cross/desktop
+	url = ../cross-desktop
+[submodule "cross/web"]
+	path = cross/web
+	url = ../cross-web
+[submodule "cross/ios"]
+	path = cross/ios
+	url = ../cross-ios
+[submodule "cross/android"]
+	path = cross/android
+	url = ../cross-android

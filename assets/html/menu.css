@@ -1,0 +1,41 @@
+*
+{
+    user-select: none;
+}
+
+body > div
+{
+    text-align: center;
+}
+
+body > div > div
+{
+    display: inline-block;
+}
+
+h4
+{
+    text-align: left;
+}
+
+p
+{
+    text-align: left;
+}
+
+.controls
+{
+    text-align: left;
+}
+
+.controls > *
+{
+    font-size: 1em;
+    margin-top: 6pt;
+    margin-bottom: 6pt;
+}
+
+.controls > button
+{
+    width: 6em;
+}
