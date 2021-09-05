@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "board.h"
 
 const std::size_t main::Board::cell_count_;
@@ -139,24 +141,22 @@ void main::Board::evaluate()
             {
                 if (humans_.test(i))
                 {
-                    score_ -= 30;
+                    score_ -= 60;
                 }
                 else
                 {
-                    score_ += 30;
+                    score_ += 60;
                 }
             }
             else
             {
-                score_ += (i / 9 * 2 + (i % 9) / 5);
+                double s = (i / 9 * 2 + (i % 9) / 5);
                 if (humans_.test(i))
                 {
-                    score_ -= 20;
+                    s =  8 - s;
                 }
-                else
-                {
-                    score_ += 12;
-                }
+                s = std::pow(s + 16.0, 1.2);
+                score_ += humans_.test(i) ? -s : s;
             }
         }
     }
