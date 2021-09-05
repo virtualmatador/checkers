@@ -41,6 +41,9 @@ function gameOver(state)
         case 2:
             banner.textContent = "Game Over!";
         break;
+        case 3:
+            banner.textContent = "Game locked!";
+        break;
     }
 }
 
@@ -71,19 +74,19 @@ function setPiece(index, piece)
     switch (piece)
     {
     case -2:
-        cell.setAttribute('data-color', alter_ ? 'wq' : 'bq');
+        cell.setAttribute('data-color', alter_ ? 'bq' : 'wq');
         break;
     case -1:
-        cell.setAttribute('data-color', alter_ ? 'wn' : 'bn');
+        cell.setAttribute('data-color', alter_ ? 'bn' : 'wn');
         break;
     case 0:
         cell.removeAttribute('data-color');
         break;
     case 1:
-        cell.setAttribute('data-color', alter_ ? 'bn' : 'wn');
+        cell.setAttribute('data-color', alter_ ? 'wn' : 'bn');
         break;
     case 2:
-        cell.setAttribute('data-color', alter_ ? 'bq' : 'wq');
+        cell.setAttribute('data-color', alter_ ? 'wq' : 'bq');
         break;
     }
     cell.removeAttribute('data-order');
@@ -92,12 +95,48 @@ function setPiece(index, piece)
 function setOrder(index, order)
 {
     var cell = document.getElementById('board').children[rotateIndex(index)];
-    cell.setAttribute('data-order', order);
+    cell.setAttribute('data-order', (cell.getAttribute('data-order') ?
+        cell.getAttribute('data-order') + ' ' : '') + order);
 }
 
 function cellClick(cell)
 {
     CallHandler("cell", "click", rotateIndex(cell.getAttribute('data-index')));
+}
+
+function setGo(state)
+{
+    var go = document.getElementById('go');
+    switch (state)
+    {
+    case 1:
+        go.innerText = "Go";
+    break;
+    case 2:
+        go.innerText = "OK";
+    break;
+    }
+    go.setAttribute('data-show', state);
+}
+
+function go()
+{
+    CallHandler("game", "go", "");
+}
+
+function setMessage(state)
+{
+    var message = document.getElementById('message');
+    switch (state)
+    {
+    case 1:
+        message.innerText = "Your Turn";
+    break;
+    case 2:
+        message.innerText = "Wait";
+    break;
+    }
+    message.setAttribute('data-show', state);
 }
 
 function rotateIndex(index)

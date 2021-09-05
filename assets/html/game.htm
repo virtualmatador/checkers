@@ -9,6 +9,11 @@
 </head>
 <body>
     <div>
+        <div id="control">
+            <div id="message" data-show="0"></div>
+            <div id="go" data-show="0" onclick="go()"></div>
+            <div id="gameover" data-show="0"></div>
+        </div>
         <div id="menu">
             <img id="more" src="more.png" onclick="more(false)">
             <div id="options">
@@ -16,9 +21,6 @@
                 <div onclick="giveUp()">Give Up</div>
                 <div onclick="newGame()">New Game</div>
             </div>
-        </div>
-        <div>
-            <div id="gameover" data-show="0"></div>
         </div>
     </div>
     <div id="board">

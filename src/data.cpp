@@ -24,7 +24,7 @@ void main::Data::load()
         toolbox::Load("OPTION_ALTER", alter_, false, false);
         toolbox::Load("OPTION_ROTATE", rotate_, false, false);
         toolbox::Load("OPTION_SOUND", sound_, false, false);
-        toolbox::Load("GAME_OVER", game_over_, 0, 3);
+        toolbox::Load("GAME_OVER", game_over_, 0, 4);
         int moves_count;
         toolbox::Load("GAME_MOVES_COUNT", moves_count,
             0, (int)Board::cell_count_);

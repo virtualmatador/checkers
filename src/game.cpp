@@ -17,13 +17,7 @@ main::Game::Game()
             return;
         else if (std::strcmp(command, "ready") == 0)
         {
-            set_preferences();
-            update_view();
-            game_over();
-            if (data_.board_.level_ != 0)
-            {
-                think();
-            }
+            reset_board();
         }
     };
     handlers_["game"] = [&](const char* command, const char* info)
@@ -44,24 +38,52 @@ main::Game::Game()
                 }
             }
             data_.reset_game();
-            update_view();
+            reset_board();
         }
         else if (std::strcmp(command, "giveup") == 0)
         {
             if (data_.game_over_ == 0)
             {
                 give_up();
+                update_view();
             }
         }
         else if (std::strcmp(command, "play") == 0)
         {
+            thinker_.join();
             std::istringstream cells{ info };
             int cell;
             while (cells >> cell)
             {
                 data_.moves_.emplace_back(cell);
             }
+            if (data_.moves_.empty())
+            {
+                draw();
+            }
             update_view();
+        }
+        else if (std::strcmp(command, "go") == 0)
+        {
+            if (data_.game_over_ == 0)
+            {
+                if (!data_.moves_.empty())
+                {
+                    if (data_.board_.level_ == 0)
+                    {
+                        if (guesser_.joinable())
+                        {
+                            guesser_.join();
+                        }
+                        move_human();
+                    }
+                    else
+                    {
+                        move_cpu();
+                    }
+                    update_view();
+                }
+            }
         }
     };
     handlers_["cell"] = [&](const char* command, const char* info)
@@ -72,125 +94,46 @@ main::Game::Game()
         {
             if (data_.game_over_ == 0)
             {
-                int index = std::strtol(info, nullptr, 10);
                 if (data_.board_.level_ == 0)
                 {
-                    if (data_.moves_.empty())
+                    int index = std::strtol(info, nullptr, 10);
+                    if (!data_.moves_.empty() &&
+                        data_.moves_.back() == index)
                     {
-                        if (data_.board_.fulls_.test(index) &&
-                            data_.board_.humans_.test(index))
-                        {
-                            data_.moves_.emplace_back(index);
-                        }
+                        data_.moves_.pop_back();
                     }
                     else
                     {
-                        if (data_.moves_[0] == index)
+                        if (data_.board_.fulls_.test(index))
                         {
-                            if (data_.moves_.size() > 1)
+                            if (data_.board_.humans_.test(index))
                             {
-                                bool valid_move = false;
-                                std::list<Board> boards;
-                                std::list<std::vector<int>> moves;
-                                data_.board_.list_options(boards, moves);
-                                auto board = boards.begin();
-                                auto move = moves.begin();
-                                while (move != moves.end())
+                                if (!data_.moves_.empty() &&
+                                    data_.moves_[0] != index)
                                 {
-                                    valid_move =
-                                        move->size() == data_.moves_.size();
-                                    if (valid_move)
-                                    {
-                                        for (std::size_t i = 0;
-                                            i < move->size(); ++i)
-                                        {
-                                            if ((*move)[i] != data_.moves_[i])
-                                            {
-                                                valid_move = false;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (valid_move)
-                                    {
-                                        break;
-                                    }
-                                    ++board;
-                                    ++move;
-                                }
-                                if (valid_move)
-                                {
-                                    data_.board_.fulls_ = board->fulls_;
-                                    data_.board_.humans_ = board->humans_;
-                                    data_.board_.level_ = 1;
                                     data_.moves_.clear();
-                                    if (data_.board_.won())
-                                    {
-                                        data_.game_over_ = 1;
-                                        game_over();
-                                        if (data_.sound_)
-                                        {
-                                            //bridge::PlayAudio(30);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        think();
-                                        if (data_.sound_)
-                                        {
-                                            //bridge::PlayAudio(29);
-                                        }
-                                    }
                                 }
-                                else
+                                data_.moves_.emplace_back(index);
+                                if (data_.moves_.size() == 1)
                                 {
-                                    if (data_.sound_)
+                                    if (guesser_.joinable())
                                     {
-                                        //bridge::PlayAudio(28);
+                                        guesser_.join();
                                     }
+                                    boards_.clear();
+                                    guess();
                                 }
-                            }
-                            else
-                            {
-                                data_.moves_.clear();
                             }
                         }
                         else
                         {
-                            if (data_.board_.fulls_.test(index))
-                            {
-                                if (data_.board_.humans_.test(index))
-                                {
-                                    data_.moves_.clear();
-                                    data_.moves_.emplace_back(index);
-                                }
-                            }
-                            else
+                            if (!data_.moves_.empty())
                             {
                                 data_.moves_.emplace_back(index);
                             }
                         }
                     }
                     update_view();
-                }
-                else if (!data_.moves_.empty() && index == data_.moves_[0])
-                {
-                    data_.board_.fulls_ = best_board_.fulls_;
-                    data_.board_.humans_ = best_board_.humans_;
-                    data_.board_.level_ = 0;
-                    data_.moves_.clear();
-                    if (data_.board_.lost())
-                    {
-                        give_up();
-                    }
-                    update_view();
-                }
-                else
-                {
-                    if (data_.sound_)
-                    {
-                        //bridge::PlayAudio(error);
-                    }
                 }
             }
         }
@@ -206,12 +149,39 @@ main::Game::~Game()
     {
         thinker_.join();
     }
+    if (guesser_.joinable())
+    {
+        guesser_.join();
+    }
 }
 
 void main::Game::Escape()
 {
     main::progress_ = PROGRESS::MENU;
     bridge::NeedRestart();
+}
+
+void main::Game::reset_board()
+{
+    boards_.clear();
+    if (data_.game_over_ == 0)
+    {
+        if (data_.board_.level_ != 0)
+        {
+            data_.moves_.clear();
+            think();
+        }
+        else
+        {
+            if (!data_.moves_.empty())
+            {
+                guess();
+            }
+        }
+    }
+    set_preferences();
+    update_view();
+    game_over();
 }
 
 void main::Game::set_preferences()
@@ -232,7 +202,7 @@ void main::Game::update_view()
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
         int piece = (!data_.board_.fulls_.test(i) ? 0 :
-            data_.board_.humans_.test(i) ? 1 : -1) *
+            data_.board_.humans_.test(i) ? -1 : 1) *
             (data_.board_.queens_.test(i) ? 2 : 1);
         std::ostringstream js;
         js << "setPiece(" << i << "," << piece << ");";
@@ -243,6 +213,102 @@ void main::Game::update_view()
         std::ostringstream js;
         js << "setOrder(" << data_.moves_[i] << "," << i << ");";
         bridge::CallFunction(js.str().c_str());
+    }
+    int message = 0, go = 0;
+    if (data_.game_over_ == 0)
+    {
+        if (data_.moves_.size() > 1)
+        {
+            go = data_.board_.is_human() ? 1 : 2;
+        }
+        else
+        {
+            message = data_.board_.is_human() ? 1 : 2;
+        }
+    }
+    {
+        std::ostringstream js;
+        js << "setMessage(" << message << ");";
+        bridge::CallFunction(js.str().c_str());
+    }
+    {
+        std::ostringstream js;
+        js << "setGo(" << go << ");";
+        bridge::CallFunction(js.str().c_str());
+    }
+}
+
+void main::Game::move_human()
+{
+    Board const * request = nullptr;
+    for (const auto& board : boards_)
+    {
+        auto move = board.trace_moves();
+        bool valid_move = move.size() == data_.moves_.size();
+        if (valid_move)
+        {
+            for (std::size_t i = 0;
+                i < move.size(); ++i)
+            {
+                if (move[i] != data_.moves_[i])
+                {
+                    valid_move = false;
+                    break;
+                }
+            }
+        }
+        if (valid_move)
+        {
+            request = &board;
+            break;
+        }
+    }
+    if (request)
+    {
+        data_.board_.apply(*request);
+        boards_.clear();
+        data_.board_.level_ = 1;
+        data_.moves_.clear();
+        if (data_.board_.won())
+        {
+            win();
+        }
+        else
+        {
+            if (data_.sound_)
+            {
+                //bridge::PlayAudio(29);
+            }
+            think();
+        }
+    }
+    else
+    {
+        if (data_.sound_)
+        {
+            //bridge::PlayAudio(28);
+        }
+    }
+}
+
+void main::Game::move_cpu()
+{
+    if (!data_.moves_.empty())
+    {
+        data_.board_.apply(best_board_);
+        data_.board_.level_ = 0;
+        data_.moves_.clear();
+        if (data_.board_.lost())
+        {
+            give_up();
+        }
+        else
+        {
+            if (data_.sound_)
+            {
+                //bridge::PlayAudio();
+            }
+        }
     }
 }
 
@@ -256,6 +322,27 @@ void main::Game::give_up()
     }
 }
 
+void main::Game::draw()
+{
+    data_.game_over_ = 3;
+    game_over();
+    if (data_.sound_)
+    {
+        //bridge::PlayAudio(32);
+    }
+}
+
+void main::Game::win()
+{
+    data_.game_over_ = 1;
+    game_over();
+    if (data_.sound_)
+    {
+        //bridge::PlayAudio(30);
+    }
+
+}
+
 void main::Game::game_over()
 {
     std::ostringstream js;
@@ -267,70 +354,99 @@ void main::Game::game_over()
 
 void main::Game::think()
 {
-    thinker_ = std::thread([this]()
+    thinker_ = std::thread([this, index = index_]()
     {
-        std::list<Board> boards;
-        std::list<std::vector<int>> moves;
-        data_.board_.list_options(boards, moves);
-        for (auto& board : boards)
+        boards_.emplace_back(data_.board_);
+        for (auto& board : boards_)
         {
             if (stop_thinking_)
             {
                 break;
             }
-            if (board.level_ < 10)
+            if (board.level_ < 7)
             {
-                board.score_ = board.level_ % 2 == 1 ?
-                    std::numeric_limits<short>::max() :
-                    std::numeric_limits<short>::min();
-                board.list_options(boards);
+                bool human = board.is_human();
+                auto original_size = boards_.size();
+                for (std::size_t i = 0; i < Board::cell_count_; ++i)
+                {
+                    if (stop_thinking_)
+                    {
+                        break;
+                    }
+                    if (board.fulls_.test(i))
+                    {
+                        if (human == board.humans_.test(i))
+                        {
+                            board.list_options(boards_, i, human);
+                        }
+                    }
+                }
+                if (original_size == boards_.size())
+                {
+                    board.evaluate();
+                }
+                else
+                {
+                    board.score_ = human ? std::numeric_limits<short>::max() :
+                        std::numeric_limits<short>::min();
+                }
             }
             else
             {
                 board.evaluate();
             }
         }
-        for (auto board = boards.crbegin(); board != boards.crend(); ++board)
+        for (auto board = boards_.rbegin(); board != boards_.rend(); ++board)
         {
             if (stop_thinking_)
             {
                 break;
             }
-            if (board->level_ % 2 == 1)
+            if (board->level_ == 1)
             {
-                board->parent_->score_ =
-                    std::max(board->parent_->score_, board->score_);
+                break;
+            }
+            if (board->is_human())
+            {
+                if (board->parent_->score_ < board->score_)
+                {
+                    board->parent_->score_ = board->score_;
+                    if (board->level_ == 2)
+                    {
+                        board->parent_->parent_ = &(*board);
+                    }
+                }
             }
             else
             {
-                board->parent_->score_ =
-                    std::min(board->parent_->score_, board->score_);                    
+                if (board->parent_->score_ > board->score_)
+                {
+                    board->parent_->score_ = board->score_;
+                }
             }
         }
-        short best_score = std::numeric_limits<short>::min();
-        std::vector<int>* best_move;
-        auto board = boards.begin();
-        auto move = moves.begin();
-        while (!stop_thinking_ && move != moves.end())
-        {
-            if (best_score < board->score_)
-            {
-                best_score = board->score_;
-                best_move = &(*move);
-            }
-            ++board;
-            ++move;
-        }
+        std::ostringstream info;
         if (!stop_thinking_)
         {
-            best_board_ = *board;
-            std::ostringstream info;
-            for (const auto& cell : *best_move)
+            if (boards_.front().parent_)
             {
-                info << cell << ' ';
+                best_board_ = *boards_.front().parent_;
+                auto moves = best_board_.trace_moves();
+                for (const auto& cell : moves)
+                {
+                    info << cell << ' ';
+                }
             }
-            bridge::PostThreadMessage(
-                index_, "game", "play", info.str().c_str());
+            bridge::PostThreadMessage(index, "game", "play", info.str().c_str());
         }
+        boards_.clear();
+    });
+}
+
+void main::Game::guess()
+{
+    guesser_ = std::thread([this, index = index_, piece = data_.moves_[0]]()
+    {
+        data_.board_.list_options(boards_, piece, true);
     });
 }

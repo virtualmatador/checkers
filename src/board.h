@@ -13,18 +13,31 @@ namespace main
     {
     public:
         static const std::size_t cell_count_ = 41;
-        static std::array<std::vector<std::size_t>, cell_count_> connections_;
+        static const int human_queen_ = 5;
+        static const int cpu_queen_ = 35;
 
     public:
         Board();
         ~Board();
         void list_options(
-            std::list<Board>& boards, std::list<std::vector<int>>& moves) const;
+            std::list<Board>& boards, const std::size_t& piece, bool human);
+        template<bool should_kill>
         void list_options(
-            std::list<Board>& boards) const;
+            std::list<Board>& boards, const std::size_t& piece, bool human);
         void evaluate();
         bool won() const;
         bool lost() const;
+        std::vector<std::size_t> trace_moves() const;
+        void apply(const Board& board);
+    
+    private:
+        template<bool forward, std::size_t movement,
+            std::size_t no_mod, bool should_kill>
+        void move(
+            std::list<Board>& boards, const std::size_t& piece, bool human);
+        void add_option(std::list<Board>& boards, const std::size_t& piece,
+            const std::size_t& victum, const std::size_t& cell, bool human);
+        bool is_human() const;
 
     private:
         std::bitset<cell_count_> fulls_;

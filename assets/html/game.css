@@ -44,6 +44,59 @@ body > div:last-child
     flex: 1 1 auto;
 }
 
+#control
+{
+    display: inline-block;
+}
+
+#control > div
+{
+    border: calc(0.15 * var(--vw)) solid black;
+    border-radius: calc(1 * var(--vw));
+    font-size: calc(var(--vw) * 2);
+    width: calc(24 * var(--vw));
+    padding: calc(1 * var(--vw));
+    text-decoration: none;
+}
+
+#control > div[data-show="0"]
+{
+    display: none;
+}
+
+#message
+{
+    font-weight: bold;
+    color: white;
+    background-color: dimgray;
+}
+
+#go
+{
+    background-color: ivory;
+}
+
+#gameover
+{
+    font-weight: bold;
+    color: white;
+}
+
+#gameover[data-show="1"]
+{
+    background-color: green;
+}
+
+#gameover[data-show="2"]
+{
+    background-color: red;
+}
+
+#gameover[data-show="3"]
+{
+    background-color: yellow;
+}
+
 #menu
 {
     display: inline-block;
@@ -83,33 +136,6 @@ body > div:last-child
     border-top: calc(var(--vw) * 0.2) solid gray;
 }
 
-#gameover
-{
-    border: calc(0.15 * var(--vw)) solid black;
-    border-radius: calc(1 * var(--vw));
-    color: white;
-    font-size: calc(3 * var(--vw));
-    font-weight: bold;
-    width: calc(24 * var(--vw));
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#gameover[data-show="0"]
-{
-    display: none;
-}
-
-#gameover[data-show="1"]
-{
-    background-color: green;
-}
-
-#gameover[data-show="2"]
-{
-    background-color: red;
-}
-
 #board
 {
     position: relative;
@@ -121,7 +147,7 @@ body > div:last-child
     height: calc(var(--vw) * (8 * 1.4143 - 0.25));
     border: calc(var(--vw) * 0.25) solid black;
     top: calc(var(--vw) * 8 * var(--y));
-    left: calc(var(--vw) * 16 * (var(--x) + var(--shift) / 2));
+    left: calc(var(--vw) * 16 * (var(--x) + var(--shift) / 2 + 0.75));
     position: absolute;
     background-color: gray;
     rotate: 45deg;
@@ -164,8 +190,9 @@ body > div:last-child
 
 .cell[data-order]::after
 {
-    font-size: calc(var(--vw) * 4);
+    font-size: calc(var(--vw) * 2);
     line-height: calc(var(--vw) * 8 * 1.4143);
+    overflow: visible;
     rotate: -45deg;
     position: absolute;
     color: darkslategray;
@@ -177,9 +204,4 @@ body > div:last-child
     left: 0;
     bottom: 0;
     right: 0;
-}
-
-.cell[data-order="0"]::after
-{
-    content: '#';
 }
