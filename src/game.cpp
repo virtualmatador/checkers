@@ -1,6 +1,8 @@
+#include <condition_variable>
 #include <cstring>
 #include <limits>
 #include <list>
+#include <mutex>
 #include <sstream>
 
 #include "helper.h"
@@ -36,6 +38,7 @@ main::Game::Game()
                 {
                     //bridge::PlayAudio(31);
                 }
+                join_threads();
             }
             data_.reset_game();
             reset_board();
@@ -44,9 +47,20 @@ main::Game::Game()
         {
             if (data_.game_over_ == 0)
             {
+                if (data_.sound_)
+                {
+                    //bridge::PlayAudio(31);
+                }
+                join_threads();
                 give_up();
                 update_view();
             }
+        }
+        else if (std::strcmp(command, "draw") == 0)
+        {
+            guesser_.join();
+            draw();
+            update_view();
         }
         else if (std::strcmp(command, "play") == 0)
         {
@@ -114,15 +128,6 @@ main::Game::Game()
                                     data_.moves_.clear();
                                 }
                                 data_.moves_.emplace_back(index);
-                                if (data_.moves_.size() == 1)
-                                {
-                                    if (guesser_.joinable())
-                                    {
-                                        guesser_.join();
-                                    }
-                                    boards_.clear();
-                                    guess();
-                                }
                             }
                         }
                         else
@@ -173,10 +178,7 @@ void main::Game::reset_board()
         }
         else
         {
-            if (!data_.moves_.empty())
-            {
-                guess();
-            }
+            guess();
         }
     }
     set_preferences();
@@ -308,6 +310,7 @@ void main::Game::move_cpu()
             {
                 //bridge::PlayAudio();
             }
+            guess();
         }
     }
 }
@@ -352,50 +355,100 @@ void main::Game::game_over()
     bridge::CallFunction(js.str().c_str());
 }
 
+void main::Game::join_threads()
+{
+    stop_thinking_ = true;
+    if (data_.board_.is_human())
+    {
+        if (guesser_.joinable())
+        {
+            guesser_.join();
+        }
+    }
+    else
+    {
+        if (thinker_.joinable())
+        {
+            thinker_.join();
+        }
+    }
+    stop_thinking_ = false;
+}
+
 void main::Game::think()
 {
     thinker_ = std::thread([this, index = index_]()
     {
         boards_.emplace_back(data_.board_);
-        for (auto& board : boards_)
+        auto progress = std::prev(boards_.begin());
+        std::vector<std::thread> workers{ std::thread::hardware_concurrency() };
+        std::size_t worker_count = 0;
+        std::mutex boards_lock;
+        std::condition_variable waker;
+        for (auto& worker : workers)
         {
-            if (stop_thinking_)
+            worker = std::thread([&]()
             {
-                break;
-            }
-            if (board.level_ < 7)
-            {
-                bool human = board.is_human();
-                auto original_size = boards_.size();
-                for (std::size_t i = 0; i < Board::cell_count_; ++i)
+                for (;;)
                 {
-                    if (stop_thinking_)
+                    std::unique_lock<std::mutex> waker_lock{ boards_lock };
+                    waker.wait(waker_lock, [&]()
+                    {
+                        return stop_thinking_ ||
+                            worker_count == 0 ||
+                            std::next(progress) != boards_.end();
+                    });
+                    if (stop_thinking_ || std::next(progress) == boards_.end())
                     {
                         break;
                     }
-                    if (board.fulls_.test(i))
+                    std::list<Board>::iterator job = ++progress;
+                    ++worker_count;
+                    waker_lock.unlock();
+                    std::list<Board> options;
+                    bool human = job->is_human();
+                    for (std::size_t i = 0; i < Board::cell_count_; ++i)
                     {
-                        if (human == board.humans_.test(i))
+                        if (job->fulls_.test(i))
                         {
-                            board.list_options(boards_, i, human);
+                            if (human == job->humans_.test(i))
+                            {
+                                job->list_options(options, i, human);
+                            }
                         }
                     }
+                    if (options.empty())
+                    {
+                        job->evaluate();
+                    }
+                    else
+                    {
+                        job->score_ = human ?
+                            std::numeric_limits<float>::max() :
+                            -std::numeric_limits<float>::max();
+                        if (job->level_ == 6)
+                        {
+                            for (auto& option : options)
+                            {
+                                option.evaluate();
+                                job->apply_score(option);
+                            }
+                            options.clear();
+                        }
+                    }
+                    waker_lock.lock();
+                    --worker_count;
+                    boards_.splice(boards_.end(), std::move(options));
+                    waker_lock.unlock();
+                    waker.notify_all();
                 }
-                if (original_size == boards_.size())
-                {
-                    board.evaluate();
-                }
-                else
-                {
-                    board.score_ = human ? std::numeric_limits<short>::max() :
-                        std::numeric_limits<short>::min();
-                }
-            }
-            else
-            {
-                board.evaluate();
-            }
+            });
         }
+        for (auto& worker : workers)
+        {
+            worker.join();
+        }
+        workers.clear();
         for (auto board = boards_.rbegin(); board != boards_.rend(); ++board)
         {
             if (stop_thinking_)
@@ -406,22 +459,24 @@ void main::Game::think()
             {
                 break;
             }
-            if (board->is_human())
+            auto parent = board->parent_;
+            while (parent->level_ == board->level_)
             {
-                if (board->parent_->score_ < board->score_)
-                {
-                    board->parent_->score_ = board->score_;
-                    if (board->level_ == 2)
-                    {
-                        board->parent_->parent_ = &(*board);
-                    }
-                }
+                parent = parent->parent_;
+            }
+            if (board->level_ > 2)
+            {
+                parent->apply_score(*board);
             }
             else
             {
-                if (board->parent_->score_ > board->score_)
+                auto score = parent->score_;
+                auto score_level_ = parent->score_level_;
+                parent->apply_score(*board);
+                if (score != parent->score_ ||
+                    score_level_ != parent->score_level_)
                 {
-                    board->parent_->score_ = board->score_;
+                    parent->parent_ = &(*board);
                 }
             }
         }
@@ -445,8 +500,28 @@ void main::Game::think()
 
 void main::Game::guess()
 {
-    guesser_ = std::thread([this, index = index_, piece = data_.moves_[0]]()
+    guesser_ = std::thread([this, index = index_]()
     {
-        data_.board_.list_options(boards_, piece, true);
+        for (std::size_t i = 0; i < Board::cell_count_; ++i)
+        {
+            if (stop_thinking_)
+            {
+                break;
+            }
+            if (data_.board_.fulls_.test(i))
+            {
+                if (data_.board_.humans_.test(i))
+                {
+                    data_.board_.list_options(boards_, i, true);
+                }
+            }
+        }
+        if (!stop_thinking_)
+        {
+            if (boards_.empty())
+            {
+                bridge::PostThreadMessage(index, "game", "draw", "");
+            }
+        }
     });
 }

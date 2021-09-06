@@ -28,6 +28,7 @@ namespace main
         void draw();
         void win();
         void game_over();
+        void join_threads();
         void think();
         void guess();
 

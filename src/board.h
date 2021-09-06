@@ -29,6 +29,7 @@ namespace main
         bool lost() const;
         std::vector<std::size_t> trace_moves() const;
         void apply(const Board& board);
+        void apply_score(const Board& board);
     
     private:
         template<bool forward, std::size_t movement,
@@ -44,7 +45,8 @@ namespace main
         std::bitset<cell_count_> humans_;
         std::bitset<cell_count_> queens_;
         Board* parent_;
-        short score_;
+        float score_;
+        unsigned short score_level_;
         unsigned short level_;
 
         friend class Data;

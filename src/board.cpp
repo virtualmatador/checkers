@@ -8,7 +8,8 @@ const int main::Board::cpu_queen_;
 
 main::Board::Board()
     : parent_{ nullptr }
-    , score_{ 0 }
+    , score_{ 0.0 }
+    , score_level_{ 0 }
     , level_ { 0 }
 {
     sizeof(Board);
@@ -132,7 +133,8 @@ bool main::Board::is_human() const
 
 void main::Board::evaluate()
 {
-    score_ = 0;
+    score_level_ = level_;
+    float human = 0.0f, cpu = 0.0f;
     for (std::size_t i = 0; i < cell_count_; ++i)
     {
         if (fulls_.test(i))
@@ -141,24 +143,34 @@ void main::Board::evaluate()
             {
                 if (humans_.test(i))
                 {
-                    score_ -= 60;
+                    human += 60.0f;
                 }
                 else
                 {
-                    score_ += 60;
+                    cpu += 60.0f;
                 }
             }
             else
             {
-                double s = (i / 9 * 2 + (i % 9) / 5);
+                std::size_t row = (i / 9 * 2 + (i % 9) / 5);
                 if (humans_.test(i))
                 {
-                    s =  8 - s;
+                    human += std::pow(8.0 - row + 16.0, 1.2);
                 }
-                s = std::pow(s + 16.0, 1.2);
-                score_ += humans_.test(i) ? -s : s;
+                else
+                {
+                    cpu += std::pow(row + 16.0, 1.2);
+                }
             }
         }
+    }
+    if (human == 0)
+    {
+        score_ = 10000.0f;
+    }
+    else
+    {
+        score_ = cpu / human;
     }
 }
 
@@ -228,4 +240,28 @@ void main::Board::apply(const Board& board)
     fulls_ = board.fulls_;
     humans_ = board.humans_;
     queens_ = board.queens_;
+}
+
+void main::Board::apply_score(const Board& board)
+{
+    if (board.is_human())
+    {
+        if (score_ < board.score_ || (score_ == board.score_ && (
+            (score_level_ < board.score_level_ && score_ < 1.0) ||
+            (score_level_ > board.score_level_ && score_ > 1.0))))
+        {
+            score_ = board.score_;
+            score_level_ = board.score_level_;
+        }
+    }
+    else
+    {
+        if (score_ > board.score_ || (score_ == board.score_ && (
+            (score_level_ < board.score_level_ && score_ < 1.0) ||
+            (score_level_ > board.score_level_ && score_ > 1.0))))
+        {
+            score_ = board.score_;
+            score_level_ = board.score_level_;
+        }
+    }
 }
