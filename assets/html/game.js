@@ -11,6 +11,20 @@ function setRotate(rotate)
     rotate_ = rotate;
 }
 
+function createCell(index, x, y, shift)
+{
+    var cell = document.createElement('div');
+    cell.classList.add('cell');
+    cell.onclick = function()
+    {
+        CallHandler("cell", "click", rotateIndex(index));
+    };
+    cell.style.setProperty('--x', x);
+    cell.style.setProperty('--y', y);
+    cell.style.setProperty('--shift', shift);
+    document.getElementById('board').appendChild(cell);
+}
+
 function newGame()
 {
     CallHandler("game", "reset", "");
@@ -97,11 +111,6 @@ function setOrder(index, order)
     var cell = document.getElementById('board').children[rotateIndex(index)];
     cell.setAttribute('data-order', (cell.getAttribute('data-order') ?
         cell.getAttribute('data-order') + ' ' : '') + order);
-}
-
-function cellClick(cell)
-{
-    CallHandler("cell", "click", rotateIndex(cell.getAttribute('data-index')));
 }
 
 function setGo(state)

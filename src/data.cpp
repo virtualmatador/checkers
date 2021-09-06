@@ -120,8 +120,10 @@ void main::Data::reset_game()
     board_.score_ = 0;
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        data_.board_.fulls_.set(i, i < 14 || i > Board::cell_count_ - 1 - 14);
-        data_.board_.humans_.set(i, i > Board::cell_count_ - 1 - 14);
+        data_.board_.fulls_.set(i, i < Board::piece_count_ ||
+            i > Board::cell_count_ - 1 - Board::piece_count_);
+        data_.board_.humans_.set(i,
+            i > Board::cell_count_ - 1 - Board::piece_count_);
         data_.board_.queens_.set(i, false);
     }
 }

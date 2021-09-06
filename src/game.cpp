@@ -19,6 +19,14 @@ main::Game::Game()
             return;
         else if (std::strcmp(command, "ready") == 0)
         {
+            for (std::size_t i = 0; i < Board::cell_count_; ++i)
+            {
+                std::ostringstream js;
+                js << "createCell(" << i << "," << Board::get_column(i) <<
+                    "," << Board::get_row(i) <<
+                    "," << Board::get_row(i) % 2 << ");";
+                bridge::CallFunction(js.str().c_str());
+            }
             reset_board();
         }
     };
@@ -420,13 +428,18 @@ void main::Game::think()
                     if (options.empty())
                     {
                         job->evaluate();
+                        if (job->score_ != 0 &&
+                            job->score_ != std::numeric_limits<float>::max())
+                        {
+                            job->score_ = 1.0;
+                        }
                     }
                     else
                     {
                         job->score_ = human ?
                             std::numeric_limits<float>::max() :
                             -std::numeric_limits<float>::max();
-                        if (job->level_ == 6)
+                        if (job->level_ == 7)
                         {
                             for (auto& option : options)
                             {

@@ -3,8 +3,7 @@
 #include "board.h"
 
 const std::size_t main::Board::cell_count_;
-const int main::Board::human_queen_;
-const int main::Board::cpu_queen_;
+const std::size_t main::Board::last_row_;
 
 main::Board::Board()
     : parent_{ nullptr }
@@ -25,24 +24,24 @@ void main::Board::list_options(
     list_options<false>(boards, piece, human);
 }
 
-template<bool should_kill>
+template<bool killer>
 void main::Board::list_options(std::list<Board>& boards,
     const std::size_t& piece, bool human)
 {
     if (human || queens_.test(piece))
     {
-        move<false, 5, 0, should_kill>(boards, piece, human);
-        move<false, 4, 4, should_kill>(boards, piece, human);
+        move<false, last_row_, 0, killer>(boards, piece, human);
+        move<false, last_row_ - 1, last_row_ - 1, killer>(boards, piece, human);
     }
     if (!human || queens_.test(piece))
     {
-        move<true, 5, 4, should_kill>(boards, piece, human);
-        move<true, 4, 0, should_kill>(boards, piece, human);
+        move<true, last_row_, last_row_ - 1, killer>(boards, piece, human);
+        move<true, last_row_ - 1, 0, killer>(boards, piece, human);
     }
 }
 
 template<bool forward, std::size_t movement,
-    std::size_t no_mod, bool should_kill>
+    std::size_t no_mod, bool killer>
 void main::Board::move(
     std::list<Board>& boards, const std::size_t& piece, bool human)
 {
@@ -51,13 +50,13 @@ void main::Board::move(
         {
             if constexpr(forward)
             {
-                return cell <= cpu_queen_;
+                return cell <= cell_count_ - 1 - last_row_;
             }
             else
             {
-                return cell >= human_queen_;
+                return cell >= last_row_;
             }
-        }() && cell % 9 != no_mod;)
+        }() && cell % (last_row_ * 2 - 1) != no_mod;)
     {
         if constexpr(forward)
         {
@@ -87,7 +86,7 @@ void main::Board::move(
         }
         else
         {
-            if constexpr(should_kill)
+            if constexpr(killer)
             {
                 if (victum != piece)
                 {
@@ -116,8 +115,8 @@ void main::Board::add_option(std::list<Board>& boards, const std::size_t& piece,
     board.fulls_.set(cell, true);
     board.humans_.set(cell, human);
     board.queens_.set(cell, queens_.test(piece) ||
-        (human && cell < human_queen_) ||
-        (!human && cell > cpu_queen_));
+        (human && cell < last_row_) ||
+        (!human && cell > cell_count_ - 1 - last_row_));
     if (victum != piece)
     {
         board.fulls_.set(victum, false);
@@ -152,21 +151,20 @@ void main::Board::evaluate()
             }
             else
             {
-                std::size_t row = (i / 9 * 2 + (i % 9) / 5);
                 if (humans_.test(i))
                 {
-                    human += std::pow(8.0 - row + 16.0, 1.2);
+                    human += std::pow(8.0 - get_row(i) + 16.0, 1.2);
                 }
                 else
                 {
-                    cpu += std::pow(row + 16.0, 1.2);
+                    cpu += std::pow(get_row(i) + 16.0, 1.2);
                 }
             }
         }
     }
     if (human == 0)
     {
-        score_ = 10000.0f;
+        score_ = std::numeric_limits<float>::max();
     }
     else
     {
@@ -264,4 +262,15 @@ void main::Board::apply_score(const Board& board)
             score_level_ = board.score_level_;
         }
     }
+}
+
+std::size_t main::Board::get_row(std::size_t cell)
+{
+    return cell / (last_row_ * 2 - 1) * 2 + (
+        cell % (last_row_ * 2 - 1)) / last_row_;
+}
+
+std::size_t main::Board::get_column(std::size_t cell)
+{
+    return cell % (last_row_ * 2 - 1) % last_row_;
 }
