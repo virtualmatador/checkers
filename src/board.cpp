@@ -9,11 +9,10 @@ constexpr float main::Board::win_score_;
 
 main::Board::Board()
     : parent_{ nullptr }
-    , score_{ 0.0 }
+    , score_{ -1.0f }
     , score_level_{ 0 }
     , level_ { 0 }
 {
-    sizeof(Board);
 }
 
 main::Board::~Board()

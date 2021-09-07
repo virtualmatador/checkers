@@ -20,6 +20,7 @@ namespace main
         void save() const;
         void reset_all();
         void reset_game();
+        void switch_sides();
     
     private:
         std::size_t difficulty_;

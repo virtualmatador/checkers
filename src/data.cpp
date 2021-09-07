@@ -109,7 +109,7 @@ void main::Data::save() const
 
 void main::Data::reset_all()
 {
-    difficulty_ = 5;
+    difficulty_ = 4;
     alter_ = false;
     rotate_ = false;
     sound_ = false;
@@ -118,16 +118,49 @@ void main::Data::reset_all()
 
 void main::Data::reset_game()
 {
-    game_over_ = false;
+    game_over_ = 0;
     moves_.clear();
     board_.level_ = 0;
-    board_.score_ = 0;
+    board_.score_ = -1.0f;
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        data_.board_.fulls_.set(i, i < Board::piece_count_ ||
+        board_.fulls_.set(i, i < Board::piece_count_ ||
             i > Board::cell_count_ - 1 - Board::piece_count_);
-        data_.board_.humans_.set(i,
+        board_.humans_.set(i,
             i > Board::cell_count_ - 1 - Board::piece_count_);
-        data_.board_.queens_.set(i, false);
+        board_.queens_.set(i, false);
+    }
+}
+
+void main::Data::switch_sides()
+{
+    rotate_ = !rotate_;
+    alter_ = !alter_;
+    if (game_over_ == 1)
+    {
+        game_over_ = 2;
+    }
+    else if (game_over_ == 2)
+    {
+        game_over_ = 1;
+    }
+    moves_.clear();
+    if (board_.level_ == 0)
+    {
+        board_.level_ = 1;
+    }
+    else if (board_.level_ == 1)
+    {
+        board_.level_ = 0;
+    }
+    board_.score_ = -1.0f;
+    auto fulls = board_.fulls_;
+    auto humans = board_.humans_;
+    auto queens = board_.queens_;
+    for (std::size_t i = 0; i < Board::cell_count_; ++i)
+    {
+        board_.fulls_.set(i, fulls.test(Board::cell_count_ - 1 - i));
+        board_.humans_.set(i, !humans.test(Board::cell_count_ - 1 - i));
+        board_.queens_.set(i, queens.test(Board::cell_count_ - 1 - i));
     }
 }

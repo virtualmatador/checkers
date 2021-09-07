@@ -40,6 +40,11 @@ function giveUp()
     CallHandler("game", "giveup", "");
 }
 
+function switchSides()
+{
+    CallHandler("game", "switch", "");
+}
+
 function gameOver(state)
 {
     var banner = document.getElementById("gameover");

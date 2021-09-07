@@ -1,6 +1,5 @@
 #include <condition_variable>
 #include <cstring>
-#include <limits>
 #include <list>
 #include <mutex>
 #include <sstream>
@@ -49,6 +48,19 @@ main::Game::Game()
                 join_threads();
             }
             data_.reset_game();
+            reset_board();
+        }
+        else if (std::strcmp(command, "switch") == 0)
+        {
+            if (data_.game_over_ == 0)
+            {
+                if (data_.sound_)
+                {
+                    //bridge::PlayAudio(31);
+                }
+                join_threads();
+            }
+            data_.switch_sides();
             reset_board();
         }
         else if (std::strcmp(command, "giveup") == 0)
@@ -157,15 +169,7 @@ main::Game::Game()
 
 main::Game::~Game()
 {
-    stop_thinking_ = true;
-    if (thinker_.joinable())
-    {
-        thinker_.join();
-    }
-    if (guesser_.joinable())
-    {
-        guesser_.join();
-    }
+    join_threads();
 }
 
 void main::Game::Escape()
@@ -437,8 +441,8 @@ void main::Game::think()
                     else
                     {
                         job->score_ = human ?
-                            std::numeric_limits<float>::max() :
-                            -std::numeric_limits<float>::max();
+                            Board::win_score_ + 1.0f :
+                            -1.0f;
                         if (job->level_ == data_.difficulty_)
                         {
                             for (auto& option : options)
