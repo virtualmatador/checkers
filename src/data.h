@@ -22,6 +22,7 @@ namespace main
         void reset_game();
     
     private:
+        std::size_t difficulty_;
         bool alter_;
         bool rotate_;
         bool sound_;

@@ -4,6 +4,8 @@
 
 const std::size_t main::Board::cell_count_;
 const std::size_t main::Board::last_row_;
+const std::size_t main::Board::difficulty_limit_;
+constexpr float main::Board::win_score_;
 
 main::Board::Board()
     : parent_{ nullptr }
@@ -114,13 +116,16 @@ void main::Board::add_option(std::list<Board>& boards, const std::size_t& piece,
     board.fulls_.set(piece, false);
     board.fulls_.set(cell, true);
     board.humans_.set(cell, human);
-    board.queens_.set(cell, queens_.test(piece) ||
-        (human && cell < last_row_) ||
-        (!human && cell > cell_count_ - 1 - last_row_));
+    board.queens_.set(cell, queens_.test(piece));
     if (victum != piece)
     {
         board.fulls_.set(victum, false);
         board.list_options<true>(boards, cell, human);
+    }
+    if (!queens_.test(cell) && ((human && cell < last_row_) ||
+        (!human && cell > cell_count_ - 1 - last_row_)))
+    {
+        board.queens_.set(cell, true);
     }
     ++board.level_;
 }
@@ -164,7 +169,7 @@ void main::Board::evaluate()
     }
     if (human == 0)
     {
-        score_ = std::numeric_limits<float>::max();
+        score_ = win_score_;
     }
     else
     {

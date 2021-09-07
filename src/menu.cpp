@@ -18,6 +18,10 @@ main::Menu::Menu()
             std::ostringstream js;
             js.str("");
             js.clear();
+            js << "setDifficulty(" << data_.difficulty_ << ");";
+            bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
             js << "setAlter(" << (data_.alter_ ? "true" : "false") << ");";
             bridge::CallFunction(js.str().c_str());
             js.str("");
@@ -36,6 +40,26 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
             Play();
+    };
+    handlers_["difficulty"] = [&](const char* command, const char* info)
+    {
+        if (std::strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "click") == 0)
+        {
+            if (std::strlen(info) == 0)
+            {
+                return;
+            }
+            else
+            {
+                std::size_t difficulty = std::strtoul(info, nullptr, 10);
+                if (difficulty < Board::difficulty_limit_)
+                {
+                    data_.difficulty_ = difficulty;
+                }
+            }
+        }
     };
     handlers_["alter"] = [&](const char* command, const char* info)
     {

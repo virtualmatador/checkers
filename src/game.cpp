@@ -429,7 +429,7 @@ void main::Game::think()
                     {
                         job->evaluate();
                         if (job->score_ != 0 &&
-                            job->score_ != std::numeric_limits<float>::max())
+                            job->score_ != Board::win_score_)
                         {
                             job->score_ = 1.0;
                         }
@@ -439,7 +439,7 @@ void main::Game::think()
                         job->score_ = human ?
                             std::numeric_limits<float>::max() :
                             -std::numeric_limits<float>::max();
-                        if (job->level_ == 7)
+                        if (job->level_ == data_.difficulty_)
                         {
                             for (auto& option : options)
                             {

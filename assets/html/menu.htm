@@ -17,6 +17,14 @@
             <div class="controls">
                 <button onclick="play()">Play</button>
                 <br>
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty" onchange="difficulty()">
+                    <option>Easy</option>
+                    <option>Normal</option>
+                    <option>Difficult</option>
+                    <option>Master</option>
+                </select>
+                <br>
                 <input id="alter" type="checkbox" onclick="alter()"><label for="alter">Play as Dark</label>
                 <br>
                 <input id="rotate" type="checkbox" onclick="rotate()"><label for="rotate">Rotate the Board</label>
