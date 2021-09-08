@@ -16,6 +16,7 @@ namespace main
         static const std::size_t last_row_ = 4;
         static const std::size_t piece_count_ = 11;
         static const std::size_t difficulty_limit_ = 9;
+        static const std::size_t max_moves_ = 13;
         static constexpr float win_score_ = 1000000.f;
 
     public:

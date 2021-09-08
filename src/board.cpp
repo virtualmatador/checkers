@@ -4,7 +4,9 @@
 
 const std::size_t main::Board::cell_count_;
 const std::size_t main::Board::last_row_;
+const std::size_t main::Board::piece_count_;
 const std::size_t main::Board::difficulty_limit_;
+const std::size_t main::Board::max_moves_;
 constexpr float main::Board::win_score_;
 
 main::Board::Board()

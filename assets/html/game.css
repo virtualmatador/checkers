@@ -1,6 +1,6 @@
 :root
 {
-    --vw: min(1vw, 1vh);
+    --vw: min(1vw, 0.75vh);
 }
 
 *
@@ -25,13 +25,7 @@ body
 body > div
 {
     margin: auto;
-    min-width: calc(98 * var(--vw));
-}
-
-body > div > div
-{
-    margin-top: calc(1 * var(--vw));
-    margin-bottom: calc(1 * var(--vw));
+    min-width: calc(100 * var(--vw));
 }
 
 body > div:not(last-child)
@@ -44,6 +38,12 @@ body > div:last-child
     flex: 1 1 auto;
 }
 
+#header
+{
+    margin-top: calc(var(--vw) * 1);
+    font-size: calc(var(--vw) * 3);
+}
+
 #control
 {
     display: inline-block;
@@ -53,7 +53,6 @@ body > div:last-child
 {
     border: calc(0.15 * var(--vw)) solid black;
     border-radius: calc(1 * var(--vw));
-    font-size: calc(var(--vw) * 2);
     width: calc(24 * var(--vw));
     padding: calc(1 * var(--vw));
     text-decoration: none;
@@ -94,7 +93,7 @@ body > div:last-child
 
 #gameover[data-show="3"]
 {
-    background-color: yellow;
+    background-color: goldenrod;
 }
 
 #menu
@@ -106,21 +105,21 @@ body > div:last-child
 
 #more
 {
-    width: calc(5 * var(--vw));
+    width: calc(8 * var(--vw));
     height: auto;
 }
 
 #options
 {
-    width: calc(var(--vw) * 20);
+    width: calc(var(--vw) * 25);
     margin-top: calc(var(--vw) * 1.5);
     border: calc(var(--vw) * 0.1) solid black;
     border-radius: calc(var(--vw) * 2);
     box-shadow: 0 0 calc(var(--vw) * 5) black;
-    font-size: calc(var(--vw) * 2);
+    font-size: calc(var(--vw) * 2.5);
     display: none;
     position: absolute;
-    z-index: 100;
+    z-index: 1000;
     right: 0pt;
     background-color: mintcream;
 }
@@ -138,67 +137,92 @@ body > div:last-child
 
 #board
 {
+    width: calc(4 * 24 * var(--vw));
+    height: calc(5 * 24 * var(--vw));
+    font-size: calc(4 * var(--vw));
+    margin: auto;
     position: relative;
 }
 
 .cell
 {
-    width: calc(var(--vw) * (8 * 1.4143 - 0.25));
-    height: calc(var(--vw) * (8 * 1.4143 - 0.25));
-    border: calc(var(--vw) * 0.25) solid black;
-    top: calc(var(--vw) * 8 * var(--y));
-    left: calc(var(--vw) * 16 * (var(--x) + var(--shift) / 2 + 0.75));
+    width: 25%;
+    height: 20%;
+    top: calc(100% / 5 / 2 * var(--y));
+    left: calc(100% / 4 / 2 * (var(--x) * 2 + var(--shift)));
     position: absolute;
-    background-color: gray;
-    rotate: 45deg;
 }
 
-.cell[data-color]::before
+.room
 {
-    width: calc(var(--vw) * 8);
-    height: calc(var(--vw) * 8);
-    rotate: -45deg;
+    width: calc(50% * 1.4142 - (var(--vw) * 0.125));
+    height: calc(50% * 1.4142 - (var(--vw) * 0.125));
+    border: calc(var(--vw) * 0.25) solid black;
+    z-index: 100;
+    background-color: darkolivegreen;
     position: absolute;
     margin: auto;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    content: '';
+    transform: rotate(45deg);
+}
+
+.piece
+{
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    z-index: 200;
+    pointer-events: none;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     background-size: 100% 100%;
 }
 
-.cell[data-color="bn"]::before
+.piece[data-color="bn"]
 {
     background-image: url(pieces/bn.png);
+    box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.cell[data-color="bq"]::before
+.piece[data-color="bq"]
 {
     background-image: url(pieces/bq.png);
+    box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.cell[data-color="wn"]::before
+.piece[data-color="wn"]
 {
     background-image: url(pieces/wn.png);
+    box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.cell[data-color="wq"]::before
+.piece[data-color="wq"]
 {
     background-image: url(pieces/wq.png);
+    box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.cell[data-order]::after
+.text
 {
-    font-size: calc(var(--vw) * 2);
-    line-height: calc(var(--vw) * 8 * 1.4143);
-    overflow: visible;
-    rotate: -45deg;
-    position: absolute;
-    color: darkslategray;
+    width: 50%;
+    height: 50%;
+    z-index: 300;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    color: chocolate;
     font-weight: bold;
     font-family: monospace;
-    content: attr(data-order);
+    position: absolute;
     margin: auto;
     top: 0;
     left: 0;

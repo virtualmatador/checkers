@@ -23,7 +23,7 @@ namespace main
         void switch_sides();
     
     private:
-        std::size_t difficulty_;
+        int difficulty_;
         bool alter_;
         bool rotate_;
         bool sound_;

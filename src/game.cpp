@@ -147,14 +147,20 @@ main::Game::Game()
                                 {
                                     data_.moves_.clear();
                                 }
-                                data_.moves_.emplace_back(index);
+                                if (data_.moves_.size() < Board::max_moves_)
+                                {
+                                    data_.moves_.emplace_back(index);
+                                }
                             }
                         }
                         else
                         {
                             if (!data_.moves_.empty())
                             {
-                                data_.moves_.emplace_back(index);
+                                if (data_.moves_.size() < Board::max_moves_)
+                                {
+                                    data_.moves_.emplace_back(index);
+                                }
                             }
                         }
                     }

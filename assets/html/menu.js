@@ -47,16 +47,16 @@ function difficulty()
     switch (document.getElementById("difficulty").value)
     {
     case 'Easy':
-        CallHandler("difficulty", "click", 2);
+        CallHandler("difficulty", "click", "2");
     break;
     case 'Normal':
-        CallHandler("difficulty", "click", 4);
+        CallHandler("difficulty", "click", "4");
     break;
     case 'Difficult':
-        CallHandler("difficulty", "click", 6);
+        CallHandler("difficulty", "click", "6");
     break;
     case 'Master':
-        CallHandler("difficulty", "click", 8);
+        CallHandler("difficulty", "click", "8");
     break;
     }
 }

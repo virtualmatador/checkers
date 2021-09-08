@@ -13,12 +13,21 @@ function setRotate(rotate)
 
 function createCell(index, x, y, shift)
 {
+    var room = document.createElement('div');
+    room.classList.add('room');
+    room.onclick = function()
+    {
+        CallHandler("cell", "click", rotateIndex(index).toString());
+    };
+    var piece = document.createElement('div');
+    piece.classList.add('piece');
+    var text = document.createElement('div');
+    text.classList.add('text');
     var cell = document.createElement('div');
     cell.classList.add('cell');
-    cell.onclick = function()
-    {
-        CallHandler("cell", "click", rotateIndex(index));
-    };
+    cell.appendChild(room);
+    cell.appendChild(piece);
+    cell.appendChild(text);
     cell.style.setProperty('--x', x);
     cell.style.setProperty('--y', y);
     cell.style.setProperty('--shift', shift);
@@ -87,35 +96,38 @@ window.onclick = function(event)
     }
 }
 
-function setPiece(index, piece)
+function setPiece(index, type)
 {
     var cell = document.getElementById('board').children[rotateIndex(index)];
-    switch (piece)
+    var piece = cell.children[1];
+    switch (type)
     {
     case -2:
-        cell.setAttribute('data-color', alter_ ? 'bq' : 'wq');
+        piece.setAttribute('data-color', alter_ ? 'bq' : 'wq');
         break;
     case -1:
-        cell.setAttribute('data-color', alter_ ? 'bn' : 'wn');
+        piece.setAttribute('data-color', alter_ ? 'bn' : 'wn');
         break;
     case 0:
-        cell.removeAttribute('data-color');
+        piece.removeAttribute('data-color');
         break;
     case 1:
-        cell.setAttribute('data-color', alter_ ? 'wn' : 'bn');
+        piece.setAttribute('data-color', alter_ ? 'wn' : 'bn');
         break;
     case 2:
-        cell.setAttribute('data-color', alter_ ? 'wq' : 'bq');
+        piece.setAttribute('data-color', alter_ ? 'wq' : 'bq');
         break;
     }
-    cell.removeAttribute('data-order');
+    var text = cell.children[2];
+    text.innerText = '';
 }
 
 function setOrder(index, order)
 {
-    var cell = document.getElementById('board').children[rotateIndex(index)];
-    cell.setAttribute('data-order', (cell.getAttribute('data-order') ?
-        cell.getAttribute('data-order') + ' ' : '') + order);
+    var text = document.getElementById('board')
+        .children[rotateIndex(index)].children[2];
+    text.innerText = (text.innerText ?
+        text.innerText + ' ' : '') + order;
 }
 
 function setGo(state)

@@ -22,7 +22,7 @@ void main::Data::load()
     try
     {
         toolbox::Load("OPTION_DIFFICULTY", difficulty_,
-            0UL, Board::difficulty_limit_);
+            0, (int)Board::difficulty_limit_);
         toolbox::Load("OPTION_ALTER", alter_, false, false);
         toolbox::Load("OPTION_ROTATE", rotate_, false, false);
         toolbox::Load("OPTION_SOUND", sound_, false, false);
