@@ -40,20 +40,45 @@ body > div:last-child
 
 #header
 {
-    margin-top: calc(var(--vw) * 1);
     font-size: calc(var(--vw) * 3);
+    margin-top: calc(var(--vw) * 1);
+    margin-bottom: calc(var(--vw) * 3);
 }
 
-#control
+#header > div
 {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+#side > div
+{
+    padding: calc(1 * var(--vw));
+    text-align: right;
     display: inline-block;
+    text-decoration: none;
+    font-weight: bold;
+    color: midnightblue;
+}
+
+#side-piece
+{
+    width: calc(6 * var(--vw));
+    height: auto;
+}
+
+#side-direction
+{
+    width: calc(6 * var(--vw));
+    height: auto;
 }
 
 #control > div
 {
     border: calc(0.15 * var(--vw)) solid black;
     border-radius: calc(1 * var(--vw));
-    width: calc(24 * var(--vw));
+    width: calc(20 * var(--vw));
     padding: calc(1 * var(--vw));
     text-decoration: none;
 }
@@ -98,25 +123,23 @@ body > div:last-child
 
 #menu
 {
-    display: inline-block;
     position: relative;
-    vertical-align: top;
 }
 
 #more
 {
-    width: calc(8 * var(--vw));
+    width: calc(6 * var(--vw));
     height: auto;
 }
 
 #options
 {
     width: calc(var(--vw) * 25);
-    margin-top: calc(var(--vw) * 1.5);
     border: calc(var(--vw) * 0.1) solid black;
     border-radius: calc(var(--vw) * 2);
+    font-size: calc(var(--vw) * 3);
     box-shadow: 0 0 calc(var(--vw) * 5) black;
-    font-size: calc(var(--vw) * 2.5);
+    top: 125%;
     display: none;
     position: absolute;
     z-index: 1000;
@@ -159,7 +182,7 @@ body > div:last-child
     height: calc(50% * 1.4142 - (var(--vw) * 0.125));
     border: calc(var(--vw) * 0.25) solid black;
     z-index: 100;
-    background-color: darkolivegreen;
+    background-color: darkslategray;
     position: absolute;
     margin: auto;
     top: 0;

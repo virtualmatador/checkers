@@ -144,7 +144,10 @@ void main::Data::switch_sides()
     {
         game_over_ = 1;
     }
-    moves_.clear();
+    for (auto& move : moves_)
+    {
+        move = Board::cell_count_ - 1 - move;
+    }
     if (board_.level_ == 0)
     {
         board_.level_ = 1;

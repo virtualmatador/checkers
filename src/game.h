@@ -24,7 +24,7 @@ namespace main
         void update_view();
         void move_human();
         void move_cpu();
-        void give_up();
+        void loose();
         void draw();
         void win();
         void game_over();

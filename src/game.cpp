@@ -63,19 +63,6 @@ main::Game::Game()
             data_.switch_sides();
             reset_board();
         }
-        else if (std::strcmp(command, "giveup") == 0)
-        {
-            if (data_.game_over_ == 0)
-            {
-                if (data_.sound_)
-                {
-                    //bridge::PlayAudio(31);
-                }
-                join_threads();
-                give_up();
-                update_view();
-            }
-        }
         else if (std::strcmp(command, "draw") == 0)
         {
             guesser_.join();
@@ -169,8 +156,8 @@ main::Game::Game()
             }
         }
     };
-    bridge::LoadWebView(index_,
-        (std::int32_t)core::VIEW_INFO::AudioNoSolo, "game", "");
+    bridge::LoadWebView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
+        (std::int32_t)core::VIEW_INFO::Portrait, "game", "");
 }
 
 main::Game::~Game()
@@ -320,7 +307,7 @@ void main::Game::move_cpu()
         data_.moves_.clear();
         if (data_.board_.lost())
         {
-            give_up();
+            loose();
         }
         else
         {
@@ -333,7 +320,7 @@ void main::Game::move_cpu()
     }
 }
 
-void main::Game::give_up()
+void main::Game::loose()
 {
     data_.game_over_ = 2;
     game_over();
@@ -361,7 +348,6 @@ void main::Game::win()
     {
         //bridge::PlayAudio(30);
     }
-
 }
 
 void main::Game::game_over()

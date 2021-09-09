@@ -4,11 +4,15 @@ var rotate_ = false;
 function setAlter(alter)
 {
     alter_ = alter;
+    document.getElementById('side-piece').setAttribute('src',
+        alter_ ? 'pieces/bn.png' : 'pieces/wn.png');
 }
 
 function setRotate(rotate)
 {
     rotate_ = rotate;
+    document.getElementById('side-direction').setAttribute('src',
+        rotate_ ? 'sides/down.png' : 'sides/up.png');
 }
 
 function createCell(index, x, y, shift)
@@ -34,24 +38,22 @@ function createCell(index, x, y, shift)
     document.getElementById('board').appendChild(cell);
 }
 
-function newGame()
-{
-    CallHandler("game", "reset", "");
-}
-
 function stop()
 {
+    more();
     CallHandler("game", "stop", "");
-}
-
-function giveUp()
-{
-    CallHandler("game", "giveup", "");
 }
 
 function switchSides()
 {
+    more();
     CallHandler("game", "switch", "");
+}
+
+function newGame()
+{
+    more();
+    CallHandler("game", "reset", "");
 }
 
 function gameOver(state)
@@ -70,29 +72,21 @@ function gameOver(state)
             banner.textContent = "Game Over!";
         break;
         case 3:
-            banner.textContent = "Game locked!";
+            banner.textContent = "Game Locked!";
         break;
     }
 }
 
-function more(hide)
+function more()
 {
     var options = document.getElementById("options");
-    if (hide || options.style.display == "block")
+    if (options.style.display == "block")
     {
         options.style.display = "none";
     }
     else
     {
         options.style.display = "block";
-    }
-}
-
-window.onclick = function(event)
-{
-    if (event.target != document.getElementById("more"))
-    {
-        more(true);
     }
 }
 
