@@ -43,7 +43,7 @@ main::Game::Game()
             {
                 if (data_.sound_)
                 {
-                    //bridge::PlayAudio(31);
+                    bridge::PlayAudio(3);
                 }
                 join_threads();
             }
@@ -56,7 +56,7 @@ main::Game::Game()
             {
                 if (data_.sound_)
                 {
-                    //bridge::PlayAudio(31);
+                    bridge::PlayAudio(3);
                 }
                 join_threads();
             }
@@ -81,6 +81,13 @@ main::Game::Game()
             if (data_.moves_.empty())
             {
                 draw();
+            }
+            else
+            {
+                if (data_.sound_)
+                {
+                    bridge::PlayAudio(4);
+                }
             }
             update_view();
         }
@@ -122,6 +129,10 @@ main::Game::Game()
                         data_.moves_.back() == index)
                     {
                         data_.moves_.pop_back();
+                        if (data_.sound_)
+                        {
+                            bridge::PlayAudio(4);
+                        }
                     }
                     else
                     {
@@ -137,6 +148,10 @@ main::Game::Game()
                                 if (data_.moves_.size() < Board::max_moves_)
                                 {
                                     data_.moves_.emplace_back(index);
+                                    if (data_.sound_)
+                                    {
+                                        bridge::PlayAudio(4);
+                                    }
                                 }
                             }
                         }
@@ -147,6 +162,10 @@ main::Game::Game()
                                 if (data_.moves_.size() < Board::max_moves_)
                                 {
                                     data_.moves_.emplace_back(index);
+                                    if (data_.sound_)
+                                    {
+                                        bridge::PlayAudio(4);
+                                    }
                                 }
                             }
                         }
@@ -157,7 +176,7 @@ main::Game::Game()
         }
     };
     bridge::LoadWebView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
-        (std::int32_t)core::VIEW_INFO::Portrait, "game", "");
+        (std::int32_t)core::VIEW_INFO::Portrait, "game", "e0 e1 e2 p0 p1 p2");
 }
 
 main::Game::~Game()
@@ -284,7 +303,7 @@ void main::Game::move_human()
         {
             if (data_.sound_)
             {
-                //bridge::PlayAudio(29);
+                bridge::PlayAudio(5);
             }
             think();
         }
@@ -293,7 +312,7 @@ void main::Game::move_human()
     {
         if (data_.sound_)
         {
-            //bridge::PlayAudio(28);
+            bridge::PlayAudio(3);
         }
     }
 }
@@ -313,7 +332,7 @@ void main::Game::move_cpu()
         {
             if (data_.sound_)
             {
-                //bridge::PlayAudio();
+                bridge::PlayAudio(5);
             }
             guess();
         }
@@ -326,7 +345,7 @@ void main::Game::loose()
     game_over();
     if (data_.sound_)
     {
-        //bridge::PlayAudio(31);
+        bridge::PlayAudio(1);
     }
 }
 
@@ -336,7 +355,7 @@ void main::Game::draw()
     game_over();
     if (data_.sound_)
     {
-        //bridge::PlayAudio(32);
+        bridge::PlayAudio(2);
     }
 }
 
@@ -346,7 +365,7 @@ void main::Game::win()
     game_over();
     if (data_.sound_)
     {
-        //bridge::PlayAudio(30);
+        bridge::PlayAudio(0);
     }
 }
 

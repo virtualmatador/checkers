@@ -78,7 +78,7 @@ body > div:last-child
 {
     border: calc(0.15 * var(--vw)) solid black;
     border-radius: calc(1 * var(--vw));
-    width: calc(20 * var(--vw));
+    width: calc(22 * var(--vw));
     padding: calc(1 * var(--vw));
     text-decoration: none;
 }
