@@ -43,7 +43,7 @@ main::Game::Game()
             {
                 if (data_.sound_)
                 {
-                    bridge::PlayAudio(3);
+                    bridge::PlayAudio(1);
                 }
                 join_threads();
             }
@@ -89,7 +89,7 @@ main::Game::Game()
                 data_.board_.traced_ = true;
                 if (data_.sound_)
                 {
-                    bridge::PlayAudio(4);
+                    bridge::PlayAudio(3);
                 }
             }
             update_view();
@@ -133,7 +133,7 @@ main::Game::Game()
                     validate_move();
                     if (data_.sound_)
                     {
-                        bridge::PlayAudio(4);
+                        bridge::PlayAudio(3);
                     }
                 }
                 else
@@ -153,7 +153,7 @@ main::Game::Game()
                                 validate_move();
                                 if (data_.sound_)
                                 {
-                                    bridge::PlayAudio(4);
+                                    bridge::PlayAudio(3);
                                 }
                             }
                         }
@@ -168,7 +168,7 @@ main::Game::Game()
                                 validate_move();
                                 if (data_.sound_)
                                 {
-                                    bridge::PlayAudio(4);
+                                    bridge::PlayAudio(3);
                                 }
                             }
                         }
@@ -179,7 +179,7 @@ main::Game::Game()
         }
     };
     bridge::LoadWebView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
-        (std::int32_t)core::VIEW_INFO::Portrait, "game", "e0 e1 e2 p0 p1 p2");
+        (std::int32_t)core::VIEW_INFO::Portrait, "game", "e0 e1 e2 p0 p1");
 }
 
 main::Game::~Game()
@@ -312,7 +312,7 @@ void main::Game::move_human()
     {
         if (data_.sound_)
         {
-            bridge::PlayAudio(5);
+            bridge::PlayAudio(4);
         }
         think();
     }
@@ -331,7 +331,7 @@ void main::Game::move_cpu()
     {
         if (data_.sound_)
         {
-            bridge::PlayAudio(5);
+            bridge::PlayAudio(4);
         }
         guess();
     }
