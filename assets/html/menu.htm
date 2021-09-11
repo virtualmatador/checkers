@@ -27,7 +27,7 @@
                 <br>
                 <input id="alter" type="checkbox" onclick="alter()"><label for="alter">Play as Dark</label>
                 <br>
-                <input id="rotate" type="checkbox" onclick="rotate()"><label for="rotate">Rotate the Board</label>
+                <input id="rotate" type="checkbox" onclick="rotate()"><label for="rotate">Play Downward</label>
                 <br>
                 <input id="sound" type="checkbox" onclick="sound()"><label for="sound">Sound</label>
                 <br>
@@ -43,15 +43,87 @@
             </p>
             <h4>The Goal</h4>
             <p>
+                Capture the opponent's pieces and prevent your pieces to be captured.
+            </p>
+            <h4>Rules</h4>
+            <p>
+                The small piece in the top of the game page, indicates the color of your pieces.
+            </p>
+            <p>
+                The green arrow in the top of the game page, indicates your forward direction. One of the following:
+            </p>
+            <ul>
+                <li>
+                    top
+                </li>
+                <li>
+                    bottom
+                </li>
+            </ul>
+            <p>
+                The opponent's forward direction is the opposite of yours.
+            </p>
+            <p>
+                Each square has four adjacent squares: top-left, top-right, bottom-left, and bottom-right.
+            </p>
+            <p>
+                If one of your pieces has an empty adjacent square at forward direction, it can move there without any capture.
+            </p>
+            <p>
+                If one of your pieces
+            </p>
+            <ul>
+                <li>
+                    has an opponent's piece in adjacent square at forward direction
+                </li>
+                <li>
+                    the next adjacent square at that direction is empty
+                </li>
+            </ul>
+            <p>
+                it can leap over the opponent's piece, capture it, and move to the next empty square.
+            </p>
+            <p>
+                If one of your pieces has made a capture, and it can make another capture, it must continue capturing as long as possible.
+            </p>
+            <p>
+                If you have the option to capture, you cannot make a move that doesn't capture.
+            </p>
+            <p>
+                When a piece reaches at the last row at its forward direction, it will promote to a king.
+            </p>
+            <p>
+                Kings can go forward and backward. They are not limited to forward direction.
+            </p>
+            <p>
+                Kings can pass any number of empty squares in each move. This is true for both before and after the leap when capturing.
+            </p>
+            <p>
+                Kings cannot leap over more than one opponent's piece in each capture.
+            </p>
+            <p>
+                Kings cannot leap over the same color pieces.
+            </p>
+            <p>
+                Kings cannot continue capturing immediately after promotion.
             </p>
             <h4>End of Game</h4>
             <p>
+                You <b>win</b> when you capture all of the the opponent's pieces.
+                <br>
+                You <b>lose</b> when all of your pieces are captured.
+                <br>
+                It's a <b>tie</b> when there are no legal moves available.
             </p>
             <h4>Options</h4>
             <p>
-                Check <b>Text</b> to show the name of the pieces.
+                Adjust the <b>Difficulty</b> to control how good your opponent will play. The default is normal.
                 <br>
-                Check <b>Sound</b> to speak out the name of the pieces.
+                Check <b>Play as Dark</b> to play with dark pieces. The default is light.
+                <br>
+                Check <b>Play Downward</b> to play toward the bottom of the page. The default is toward the top.
+                <br>
+                Check <b>Sound</b> to activate sound effects.
                 <br>
                 Press <b>Reset</b> to clear all saved information. Both game data and settings will be removed.
             </p>
