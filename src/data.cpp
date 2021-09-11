@@ -29,18 +29,20 @@ void main::Data::load()
         toolbox::Load("GAME_OVER", game_over_, 0, 4);
         int moves_count;
         toolbox::Load("GAME_MOVES_COUNT", moves_count,
-            0, (int)Board::cell_count_);
+            0, (int)Board::cell_count_ / 2);
+        board_.moves_.clear();
         for (std::size_t i = 0; i < moves_count; ++i)
         {
             std::ostringstream composer;
             int buffer;
             composer << "GAME_MOVES_" << i;
             toolbox::Load(composer.str().c_str(), buffer,
-                -1, (int)Board::cell_count_);
-            moves_.emplace_back(buffer);
+                0, (int)Board::cell_count_);
+            board_.moves_.emplace_back((unsigned char)buffer);
         }
-        toolbox::Load("GAME_LEVEL", board_.level_,
-            (unsigned short)0, (unsigned short)2);
+        int level;
+        toolbox::Load("GAME_LEVEL", level, 0, 2);
+        board_.level_ = (unsigned char)level;
         for (std::size_t i = 0; i < board_.fulls_.size(); ++i)
         {
             std::ostringstream composer;
@@ -79,14 +81,14 @@ void main::Data::save() const
     toolbox::Save("OPTION_ROTATE", rotate_);
     toolbox::Save("OPTION_SOUND", sound_);
     toolbox::Save("GAME_OVER", game_over_);
-    toolbox::Save("GAME_MOVES_COUNT", moves_.size());
-    for (std::size_t i = 0; i < moves_.size(); ++i)
+    toolbox::Save("GAME_MOVES_COUNT", board_.moves_.size());
+    for (std::size_t i = 0; i < board_.moves_.size(); ++i)
     {
         std::ostringstream composer;
         composer << "GAME_MOVES_" << i;
-        toolbox::Save(composer.str().c_str(), moves_[i]);
+        toolbox::Save(composer.str().c_str(), (unsigned int)board_.moves_[i]);
     }
-    toolbox::Save("GAME_LEVEL", board_.level_);
+    toolbox::Save("GAME_LEVEL", (unsigned int)board_.level_);
     for (std::size_t i = 0; i < board_.fulls_.size(); ++i)
     {
         std::ostringstream composer;
@@ -119,7 +121,7 @@ void main::Data::reset_all()
 void main::Data::reset_game()
 {
     game_over_ = 0;
-    moves_.clear();
+    board_.moves_.clear();
     board_.level_ = 0;
     board_.score_ = -1.0f;
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
@@ -144,7 +146,7 @@ void main::Data::switch_sides()
     {
         game_over_ = 1;
     }
-    for (auto& move : moves_)
+    for (auto& move : board_.moves_)
     {
         move = Board::cell_count_ - 1 - move;
     }

@@ -22,23 +22,22 @@ namespace main
     public:
         Board();
         ~Board();
-        void list_options(
-            std::list<Board>& boards, const std::size_t& piece, bool human);
+        std::list<Board> list_options();
         template<bool killer>
-        void list_options(
-            std::list<Board>& boards, const std::size_t& piece, bool human);
+        void list_options(std::list<Board>& boards,
+            const std::size_t& piece, bool human);
         void evaluate();
         bool won() const;
         bool lost() const;
-        std::vector<std::size_t> trace_moves() const;
         void apply(const Board& board);
         void apply_score(const Board& board);
     
     private:
         template<bool forward, std::size_t movement,
             std::size_t no_mod, bool killer>
-        void move(
-            std::list<Board>& boards, const std::size_t& piece, bool human);
+        void move(std::list<Board>& boards,
+            const std::size_t& piece, bool human);
+        template<bool killer>
         void add_option(std::list<Board>& boards, const std::size_t& piece,
             const std::size_t& victum, const std::size_t& cell, bool human);
         bool is_human() const;
@@ -51,10 +50,13 @@ namespace main
         std::bitset<cell_count_> fulls_;
         std::bitset<cell_count_> humans_;
         std::bitset<cell_count_> queens_;
+        std::vector<unsigned char> moves_;
         Board* parent_;
         float score_;
-        unsigned short score_level_;
-        unsigned short level_;
+        unsigned char score_level_;
+        unsigned char level_;
+        bool kills_;
+        bool traced_;
 
         friend class Data;
         friend class Game;

@@ -13,18 +13,46 @@ main::Board::Board()
     : parent_{ nullptr }
     , score_{ -1.0f }
     , score_level_{ 0 }
-    , level_ { 0 }
+    , level_{ 0 }
+    , kills_{ false }
+    , traced_{ false }
 {
 }
 
 main::Board::~Board()
 {
+    sizeof(Board);
 }
 
-void main::Board::list_options(
-    std::list<Board>& boards, const std::size_t& piece, bool human)
+std::list<main::Board> main::Board::list_options()
 {
-    list_options<false>(boards, piece, human);
+    kills_ = false;
+    std::list<Board> options;
+    for (std::size_t i = 0; i < Board::cell_count_; ++i)
+    {
+        if (fulls_.test(i))
+        {
+            if (humans_.test(i) == is_human())
+            {
+                list_options<false>(options, i, is_human());
+            }
+        }
+    }
+    if (kills_)
+    {
+        for (auto it = options.begin(); it != options.end();)
+        {
+            if (!it->kills_)
+            {
+                it = options.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+    return options;
 }
 
 template<bool killer>
@@ -34,19 +62,21 @@ void main::Board::list_options(std::list<Board>& boards,
     if (human || queens_.test(piece))
     {
         move<false, last_row_, 0, killer>(boards, piece, human);
-        move<false, last_row_ - 1, last_row_ - 1, killer>(boards, piece, human);
+        move<false, last_row_ - 1, last_row_ - 1, killer>(
+            boards, piece, human);
     }
     if (!human || queens_.test(piece))
     {
-        move<true, last_row_, last_row_ - 1, killer>(boards, piece, human);
+        move<true, last_row_, last_row_ - 1, killer>(
+            boards, piece, human);
         move<true, last_row_ - 1, 0, killer>(boards, piece, human);
     }
 }
 
 template<bool forward, std::size_t movement,
     std::size_t no_mod, bool killer>
-void main::Board::move(
-    std::list<Board>& boards, const std::size_t& piece, bool human)
+void main::Board::move(std::list<Board>& boards,
+    const std::size_t& piece, bool human)
 {
     auto victum = piece;
     for (std::size_t cell = piece; [&]()
@@ -93,12 +123,21 @@ void main::Board::move(
             {
                 if (victum != piece)
                 {
-                    add_option(boards, piece, victum, cell, human);
+                    traced_ = true;
+                    add_option<true>(boards, piece, victum, cell, human);
                 }
             }
             else
             {
-                add_option(boards, piece, victum, cell, human);
+                if (victum != piece)
+                {
+                    kills_ = true;
+                    add_option<false>(boards, piece, victum, cell, human);
+                }
+                else if (!kills_)
+                {
+                    add_option<false>(boards, piece, victum, cell, human);
+                }
             }
             if (!queens_.test(piece))
             {
@@ -108,27 +147,53 @@ void main::Board::move(
     }
 }
 
+template<bool killer>
 void main::Board::add_option(std::list<Board>& boards, const std::size_t& piece,
     const std::size_t& victum, const std::size_t& cell, bool human)
 {
-    boards.emplace_back(*this);
-    auto& board = boards.back();
-    board.parent_ = this;
+    auto board = *this;
+    if constexpr(killer)
+    {
+        board.parent_ = parent_;
+    }
+    else
+    {
+        board.parent_ = this;
+        board.moves_.clear();
+        ++board.level_;
+        if (!board.parent_->parent_)
+        {
+            board.moves_.emplace_back((unsigned char)piece);
+        }
+    }
+    if (!board.parent_->parent_)
+    {
+        board.moves_.emplace_back((unsigned char)cell);
+    }
     board.fulls_.set(piece, false);
     board.fulls_.set(cell, true);
     board.humans_.set(cell, human);
     board.queens_.set(cell, queens_.test(piece));
-    if (victum != piece)
-    {
-        board.fulls_.set(victum, false);
-        board.list_options<true>(boards, cell, human);
-    }
-    if (!queens_.test(cell) && ((human && cell < last_row_) ||
-        (!human && cell > cell_count_ - 1 - last_row_)))
+    board.kills_ = victum != piece;
+    board.traced_ = false;
+    bool convert = !board.queens_.test(cell) && ((human && cell < last_row_) ||
+        (!human && cell > cell_count_ - 1 - last_row_));
+    if (convert)
     {
         board.queens_.set(cell, true);
     }
-    ++board.level_;
+    if (board.kills_)
+    {
+        board.fulls_.set(victum, false);
+        if (!convert)
+        {
+            board.list_options<true>(boards, cell, human);
+        }
+    }
+    if (!board.traced_)
+    {
+        boards.emplace_back(board);
+    }
 }
 
 bool main::Board::is_human() const
@@ -200,43 +265,6 @@ bool main::Board::lost() const
         }
     }
     return true;
-}
-
-std::vector<std::size_t> main::Board::trace_moves() const
-{
-    bool human = !is_human();
-    std::vector<std::size_t> move;
-    for (std::size_t i = 0; i < cell_count_; ++i)
-    {
-        if (fulls_.test(i))
-        {
-            if (!parent_->fulls_.test(i))
-            {
-                move.insert(move.begin(), i);
-                break;
-            }
-        }
-    }
-    for (auto board = this;; board = board->parent_)
-    {
-        for (std::size_t i = 0; i < cell_count_; ++i)
-        {
-            if (!board->fulls_.test(i))
-            {
-                if (board->parent_->fulls_.test(i) &&
-                    board->parent_->humans_.test(i) == human)
-                {
-                    move.insert(move.begin(), i);
-                    break;
-                }
-            }
-        }
-        if (board->level_ != board->parent_->level_)
-        {
-            break;
-        }
-    }
-    return move;
 }
 
 void main::Board::apply(const Board& board)

@@ -21,6 +21,7 @@ namespace main
     private:
         void reset_board();
         void set_preferences();
+        void validate_move();
         void update_view();
         void move_human();
         void move_cpu();

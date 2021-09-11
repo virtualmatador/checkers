@@ -28,7 +28,6 @@ namespace main
         bool rotate_;
         bool sound_;
         int game_over_;
-        std::vector<int> moves_;
         Board board_;
     };
 

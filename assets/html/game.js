@@ -72,7 +72,7 @@ function gameOver(state)
             banner.textContent = "Game Over!";
         break;
         case 3:
-            banner.textContent = "Game Locked!";
+            banner.textContent = "Locked!";
         break;
     }
 }
