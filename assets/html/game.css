@@ -1,6 +1,6 @@
 :root
 {
-    --vw: min(1vw, 0.75vh);
+    --vw: min(1vw, 0.7vh);
 }
 
 *
@@ -41,8 +41,8 @@ body > div:last-child
 #header
 {
     font-size: calc(var(--vw) * 3);
-    margin-top: calc(var(--vw) * 1);
-    margin-bottom: calc(var(--vw) * 3);
+    margin-top: calc(var(--vw) * 4);
+    margin-bottom: calc(var(--vw) * 5);
 }
 
 #header > div

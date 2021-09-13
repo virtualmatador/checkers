@@ -21,7 +21,6 @@ main::Board::Board()
 
 main::Board::~Board()
 {
-    sizeof(Board);
 }
 
 std::list<main::Board> main::Board::list_options()

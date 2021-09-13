@@ -179,7 +179,8 @@ main::Game::Game()
         }
     };
     bridge::LoadWebView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
-        (std::int32_t)core::VIEW_INFO::Portrait, "game", "e0 e1 e2 p0 p1");
+        (std::int32_t)core::VIEW_INFO::Portrait |
+        (std::int32_t)core::VIEW_INFO::ScreenOn, "game", "e0 e1 e2 p0 p1");
 }
 
 main::Game::~Game()
