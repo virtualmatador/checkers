@@ -10,3 +10,6 @@
 [submodule "cross/android"]
 	path = cross/android
 	url = ../cross-android
+[submodule "cross/windows"]
+	path = cross/windows
+	url = ../cross-windows
