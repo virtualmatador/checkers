@@ -11,6 +11,8 @@ namespace main
         Menu();
         ~Menu();
         void Escape() override;
+        void FeedUri(const char* uri, std::function<void(
+            const std::vector<unsigned char>&)>&& consume) override;
 
     private:
         void Play();

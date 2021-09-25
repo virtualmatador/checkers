@@ -133,10 +133,10 @@ main::Menu::Menu()
             bridge::NeedRestart();
         }
     };
-    bridge::LoadWebView(index_,
+    bridge::LoadView(index_,
         (std::int32_t)core::VIEW_INFO::Default |
         (std::int32_t) core::VIEW_INFO::AudioNoSolo,
-        "menu", "");
+        "menu");
 }
 
 main::Menu::~Menu()
@@ -152,4 +152,9 @@ void main::Menu::Play()
 {
     progress_ = PROGRESS::GAME;
     bridge::NeedRestart();
+}
+
+void main::Menu::FeedUri(const char* uri, std::function<void(
+    const std::vector<unsigned char>&)>&& consume)
+{
 }

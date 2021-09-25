@@ -17,8 +17,11 @@ namespace main
         Game();
         ~Game();
         void Escape() override;
+        void FeedUri(const char* uri, std::function<void(
+            const std::vector<unsigned char>&)>&& consume) override;
 
     private:
+        void play_audio(const char* audio);
         void reset_board();
         void set_preferences();
         void validate_move();

@@ -1,6 +1,46 @@
 var alter_ = false;
 var rotate_ = false;
 
+var audios_= [];
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+
+function setup()
+{
+    var ids =
+    [
+        'click', 'draw', 'lose', 'move', 'win'
+    ];
+    var loaded = 0;
+    ids.forEach(function(id)
+    {
+        var request = new XMLHttpRequest();
+        request.open('GET', cross_asset_domain_ + 'wave/' + id + '.wav', cross_asset_async_);
+        request.responseType = 'arraybuffer';
+        request.onload = function()
+        {
+            var audioData = request.response;
+            audioCtx.decodeAudioData(audioData, function(buffer)
+            {
+                audios_[id] = buffer;
+                if (++loaded == ids.length)
+                {
+                    setTimeout(CallHandler, 0, 'body', 'setup', '');
+                }
+            });
+        };
+        request.send();
+    });
+}
+
+function playAudio(id)
+{
+    var source = audioCtx.createBufferSource();
+    source.buffer = audios_[id];
+    source.connect(audioCtx.destination);
+    source.start(0);
+}
+
 function setAlter(alter)
 {
     alter_ = alter;

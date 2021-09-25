@@ -18,6 +18,10 @@ main::Game::Game()
             return;
         else if (std::strcmp(command, "ready") == 0)
         {
+            bridge::CallFunction("setup();");
+        }
+        else if (std::strcmp(command, "setup") == 0)
+        {
             for (std::size_t i = 0; i < Board::cell_count_; ++i)
             {
                 std::ostringstream js;
@@ -41,10 +45,7 @@ main::Game::Game()
         {
             if (data_.game_over_ == 0)
             {
-                if (data_.sound_)
-                {
-                    bridge::PlayAudio(1);
-                }
+                play_audio("lose");
                 join_threads();
             }
             data_.reset_game();
@@ -54,10 +55,7 @@ main::Game::Game()
         {
             if (data_.game_over_ == 0)
             {
-                if (data_.sound_)
-                {
-                    bridge::PlayAudio(3);
-                }
+                play_audio("click");
                 join_threads();
             }
             data_.switch_sides();
@@ -87,10 +85,7 @@ main::Game::Game()
             else
             {
                 data_.board_.traced_ = true;
-                if (data_.sound_)
-                {
-                    bridge::PlayAudio(3);
-                }
+                play_audio("click");
             }
             update_view();
         }
@@ -131,10 +126,7 @@ main::Game::Game()
                 {
                     data_.board_.moves_.pop_back();
                     validate_move();
-                    if (data_.sound_)
-                    {
-                        bridge::PlayAudio(3);
-                    }
+                    play_audio("click");
                 }
                 else
                 {
@@ -151,10 +143,7 @@ main::Game::Game()
                             {
                                 data_.board_.moves_.emplace_back(index);
                                 validate_move();
-                                if (data_.sound_)
-                                {
-                                    bridge::PlayAudio(3);
-                                }
+                                play_audio("click");
                             }
                         }
                     }
@@ -166,10 +155,7 @@ main::Game::Game()
                             {
                                 data_.board_.moves_.emplace_back(index);
                                 validate_move();
-                                if (data_.sound_)
-                                {
-                                    bridge::PlayAudio(3);
-                                }
+                                play_audio("click");
                             }
                         }
                     }
@@ -178,9 +164,9 @@ main::Game::Game()
             }
         }
     };
-    bridge::LoadWebView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
+    bridge::LoadView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
         (std::int32_t)core::VIEW_INFO::Portrait |
-        (std::int32_t)core::VIEW_INFO::ScreenOn, "game", "e0 e1 e2 p0 p1");
+        (std::int32_t)core::VIEW_INFO::ScreenOn, "game");
 }
 
 main::Game::~Game()
@@ -192,6 +178,16 @@ void main::Game::Escape()
 {
     main::progress_ = PROGRESS::MENU;
     bridge::NeedRestart();
+}
+
+void main::Game::play_audio(const char* audio)
+{
+    if (data_.sound_)
+    {
+        std::ostringstream js;
+        js << "playAudio('" << audio << "');";
+        bridge::CallFunction(js.str().c_str());
+    }
 }
 
 void main::Game::reset_board()
@@ -311,10 +307,7 @@ void main::Game::move_human()
     }
     else
     {
-        if (data_.sound_)
-        {
-            bridge::PlayAudio(4);
-        }
+        play_audio("move");
         think();
     }
 }
@@ -330,10 +323,7 @@ void main::Game::move_cpu()
     }
     else
     {
-        if (data_.sound_)
-        {
-            bridge::PlayAudio(4);
-        }
+        play_audio("move");
         guess();
     }
 }
@@ -342,30 +332,21 @@ void main::Game::loose()
 {
     data_.game_over_ = 2;
     game_over();
-    if (data_.sound_)
-    {
-        bridge::PlayAudio(1);
-    }
+    play_audio("lose");
 }
 
 void main::Game::draw()
 {
     data_.game_over_ = 3;
     game_over();
-    if (data_.sound_)
-    {
-        bridge::PlayAudio(2);
-    }
+    play_audio("draw");
 }
 
 void main::Game::win()
 {
     data_.game_over_ = 1;
     game_over();
-    if (data_.sound_)
-    {
-        bridge::PlayAudio(0);
-    }
+    play_audio("win");
 }
 
 void main::Game::game_over()
@@ -403,7 +384,7 @@ void main::Game::think()
     boards_.emplace_back(data_.board_);
     thinker_ = std::thread([this, index = index_]()
     {
-        auto progress = std::prev(boards_.begin());
+        auto progress = boards_.begin();
         std::vector<std::thread> workers{ std::thread::hardware_concurrency() };
         std::size_t worker_count = 0;
         std::mutex boards_lock;
@@ -419,13 +400,13 @@ void main::Game::think()
                     {
                         return stop_thinking_ ||
                             worker_count == 0 ||
-                            std::next(progress) != boards_.end();
+                            progress != boards_.end();
                     });
-                    if (stop_thinking_ || std::next(progress) == boards_.end())
+                    if (stop_thinking_ || progress == boards_.end())
                     {
                         break;
                     }
-                    std::list<Board>::iterator job = ++progress;
+                    std::list<Board>::iterator job = progress++;
                     ++worker_count;
                     waker_lock.unlock();
                     std::list<Board> options = job->list_options();
@@ -457,7 +438,9 @@ void main::Game::think()
                     }
                     waker_lock.lock();
                     --worker_count;
+                    --progress;
                     boards_.splice(boards_.end(), std::move(options));
+                    ++progress;
                     waker_lock.unlock();
                     waker.notify_all();
                 }
@@ -505,7 +488,7 @@ void main::Game::think()
             {
                 best_board_.moves_.clear();
             }
-            bridge::PostThreadMessage(index, "game", "play", "");
+            bridge::AsyncMessage(index, "game", "play", "");
         }
         boards_.clear();
     });
@@ -519,7 +502,12 @@ void main::Game::guess()
         boards_ = data_.board_.list_options();
         if (!stop_thinking_)
         {
-            bridge::PostThreadMessage(index, "game", "validate", "");
+            bridge::AsyncMessage(index, "game", "validate", "");
         }
     });
+}
+
+void main::Game::FeedUri(const char* uri, std::function<void(
+    const std::vector<unsigned char>&)>&& consume)
+{
 }
