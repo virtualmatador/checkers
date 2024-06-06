@@ -1,6 +1,6 @@
-[submodule "cross/desktop"]
-	path = cross/desktop
-	url = ../cross-desktop
+[submodule "cross/linux"]
+	path = cross/linux
+	url = ../cross-linux
 [submodule "cross/web"]
 	path = cross/web
 	url = ../cross-web
