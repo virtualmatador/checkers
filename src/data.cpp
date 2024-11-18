@@ -22,14 +22,15 @@ void main::Data::load()
     try
     {
         toolbox::Load("OPTION_DIFFICULTY", difficulty_,
-            0, (int)Board::difficulty_limit_);
+                      0, (int)Board::difficulty_limit_);
         toolbox::Load("OPTION_ALTER", alter_, false, false);
         toolbox::Load("OPTION_ROTATE", rotate_, false, false);
         toolbox::Load("OPTION_SOUND", sound_, false, false);
+        toolbox::Load("OPTION_THUMB", thumb_, false, false);
         toolbox::Load("GAME_OVER", game_over_, 0, 4);
         int moves_count;
         toolbox::Load("GAME_MOVES_COUNT", moves_count,
-            0, (int)Board::cell_count_ / 2);
+                      0, (int)Board::cell_count_ / 2);
         board_.moves_.clear();
         for (std::size_t i = 0; i < moves_count; ++i)
         {
@@ -37,7 +38,7 @@ void main::Data::load()
             int buffer;
             composer << "GAME_MOVES_" << i;
             toolbox::Load(composer.str().c_str(), buffer,
-                0, (int)Board::cell_count_);
+                          0, (int)Board::cell_count_);
             board_.moves_.emplace_back((unsigned char)buffer);
         }
         int level;
@@ -68,7 +69,7 @@ void main::Data::load()
             board_.queens_.set(i, buffer);
         }
     }
-    catch(...)
+    catch (...)
     {
         reset_all();
     }
@@ -80,6 +81,7 @@ void main::Data::save() const
     toolbox::Save("OPTION_ALTER", alter_);
     toolbox::Save("OPTION_ROTATE", rotate_);
     toolbox::Save("OPTION_SOUND", sound_);
+    toolbox::Save("OPTION_THUMB", thumb_);
     toolbox::Save("GAME_OVER", game_over_);
     toolbox::Save("GAME_MOVES_COUNT", board_.moves_.size());
     for (std::size_t i = 0; i < board_.moves_.size(); ++i)
@@ -115,6 +117,7 @@ void main::Data::reset_all()
     alter_ = false;
     rotate_ = false;
     sound_ = false;
+    thumb_ = false;
     reset_game();
 }
 
@@ -127,9 +130,9 @@ void main::Data::reset_game()
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
         board_.fulls_.set(i, i < Board::piece_count_ ||
-            i > Board::cell_count_ - 1 - Board::piece_count_);
+                                 i > Board::cell_count_ - 1 - Board::piece_count_);
         board_.humans_.set(i,
-            i > Board::cell_count_ - 1 - Board::piece_count_);
+                           i > Board::cell_count_ - 1 - Board::piece_count_);
         board_.queens_.set(i, false);
     }
 }
@@ -146,7 +149,7 @@ void main::Data::switch_sides()
     {
         game_over_ = 1;
     }
-    for (auto& move : board_.moves_)
+    for (auto &move : board_.moves_)
     {
         move = Board::cell_count_ - 1 - move;
     }

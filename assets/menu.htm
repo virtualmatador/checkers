@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
     <link rel="stylesheet" href="menu.css">
-    <script src="menu.js" ></script>
+    <script src="menu.js"></script>
     <title>Checkers</title>
 </head>
+
 <body>
     <div>
         <div>
@@ -30,6 +32,8 @@
                 <input id="rotate" type="checkbox" onclick="rotate()"><label for="rotate">Play Downward</label>
                 <br>
                 <input id="sound" type="checkbox" onclick="sound()"><label for="sound">Sound</label>
+                <br>
+                <input id="thumb" type="checkbox" onclick="thumb()"><label for="thumb">Menu at Bottom</label>
                 <br>
                 <button onclick="reset()">Reset</button>
             </div>
@@ -59,7 +63,8 @@
                 Each square has four adjacent squares: top-left, top-right, bottom-left, and bottom-right.
             </p>
             <p>
-                If one of your pieces has an empty adjacent square at forward direction, it can move there without any capture.
+                If one of your pieces has an empty adjacent square at forward direction, it can move there without any
+                capture.
             </p>
             <p>
                 If one of your pieces
@@ -76,7 +81,8 @@
                 it can leap over the opponent's piece, capture it, and move to the next empty square.
             </p>
             <p>
-                If one of your pieces has made a capture, and it can make another capture, it must continue capturing as long as possible.
+                If one of your pieces has made a capture, and it can make another capture, it must continue capturing as
+                long as possible.
             </p>
             <p>
                 If you have the option to capture, you cannot make a move that doesn't capture.
@@ -88,7 +94,8 @@
                 Kings can go forward and backward. They are not limited to forward direction.
             </p>
             <p>
-                Kings can pass any number of empty squares in each move. This is true for both before and after the leap when capturing.
+                Kings can pass any number of empty squares in each move. This is true for both before and after the leap
+                when capturing.
             </p>
             <p>
                 Kings cannot leap over more than one opponent's piece in each capture.
@@ -114,10 +121,12 @@
                     If you are capturing an opponent's piece, you don't need to tap it.
                 </li>
                 <li>
-                    If you are making another capture, tap the empty square you move to next. You will see number <b>2</b> over it.
+                    If you are making another capture, tap the empty square you move to next. You will see number
+                    <b>2</b> over it.
                 </li>
                 <li>
-                    If more captures are available, continue tapping empty squares. You will see numbers <b>3, 4, ...</b> over them.
+                    If more captures are available, continue tapping empty squares. You will see numbers <b>3, 4,
+                        ...</b> over them.
                 </li>
                 <li>
                     You can change the piece you want to move, just tap on another piece.
@@ -126,7 +135,8 @@
                     You can clear your last tapped square - containing the highest number - by tapping it again.
                 </li>
                 <li>
-                    If your input is legal, the <b>Go</b> button will relpace <b>Your Turn</b>. Tap it to apply your move.
+                    If your input is legal, the <b>Go</b> button will replace <b>Your Turn</b>. Tap it to apply your
+                    move.
                 </li>
             </ul>
             <h4>End of Game</h4>
@@ -158,9 +168,12 @@
                 <br>
                 Check <b>Sound</b> to activate sound effects. The default is silent.
                 <br>
+                Check <b>Menu at Bottom</b> to put controls below the board. The default is above the board.
+                <br>
                 Press <b>Reset</b> to clear all saved information. Both game data and settings will be cleared.
             </p>
         </div>
     </div>
 </body>
+
 </html>

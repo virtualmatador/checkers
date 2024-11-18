@@ -1,60 +1,41 @@
-:root
-{
+:root {
     --vw: min(1vw, 0.7vh);
 }
 
-*
-{
+* {
     user-select: none;
     -webkit-user-select: none;
 }
 
-html, body
-{
+html,
+body {
     height: 100%;
     margin: 0;
 }
 
-body
-{
+body {
     display: flex;
+    gap: calc(6 * var(--vw));
     flex-flow: column;
     background-color: slategray;
     text-align: center;
 }
 
-body > div
-{
-    margin: auto;
+body>div {
     min-width: calc(100 * var(--vw));
 }
 
-body > div:not(last-child)
-{
-    flex: 0 1 auto;
+#header {
+    font-size: calc(3 * var(--vw));
 }
 
-body > div:last-child
-{
-    flex: 1 1 auto;
-}
-
-#header
-{
-    font-size: calc(var(--vw) * 3);
-    margin-top: calc(var(--vw) * 4);
-    margin-bottom: calc(var(--vw) * 5);
-}
-
-#header > div
-{
+#header>div {
     display: inline-flex;
     align-items: center;
     vertical-align: middle;
 }
 
-#side > div
-{
+#side>div {
     padding: calc(1 * var(--vw));
     text-align: right;
     display: inline-block;
@@ -63,20 +44,17 @@ body > div:last-child
     color: midnightblue;
 }
 
-#side-piece
-{
+#side-piece {
     width: calc(6 * var(--vw));
     height: auto;
 }
 
-#side-direction
-{
+#side-direction {
     width: calc(6 * var(--vw));
     height: auto;
 }
 
-#control > div
-{
+#control>div {
     border: calc(0.15 * var(--vw)) solid black;
     border-radius: calc(1 * var(--vw));
     width: calc(22 * var(--vw));
@@ -84,63 +62,56 @@ body > div:last-child
     text-decoration: none;
 }
 
-#control > div[data-show="0"]
-{
+#control>div[data-show="0"] {
     display: none;
 }
 
-#message
-{
+#message {
+    cursor: default;
     font-weight: bold;
     color: white;
     background-color: dimgray;
 }
 
-#go
-{
+#go {
+    cursor: default;
     background-color: ivory;
 }
 
-#gameover
-{
+#gameover {
+    cursor: default;
     font-weight: bold;
     color: white;
 }
 
-#gameover[data-show="1"]
-{
+#gameover[data-show="1"] {
     background-color: green;
 }
 
-#gameover[data-show="2"]
-{
+#gameover[data-show="2"] {
     background-color: red;
 }
 
-#gameover[data-show="3"]
-{
+#gameover[data-show="3"] {
     background-color: goldenrod;
 }
 
-#menu
-{
+#menu {
     position: relative;
 }
 
-#more
-{
+#more {
     width: calc(6 * var(--vw));
     height: auto;
 }
 
-#options
-{
+#options {
     width: calc(var(--vw) * 25);
     border: calc(var(--vw) * 0.1) solid black;
     border-radius: calc(var(--vw) * 2);
     font-size: calc(var(--vw) * 3);
     box-shadow: 0 0 calc(var(--vw) * 5) black;
-    top: 125%;
+    top: calc(125% + var(--y));
     display: none;
     position: absolute;
     z-index: 1000;
@@ -148,28 +119,24 @@ body > div:last-child
     background-color: mintcream;
 }
 
-#options > div
-{
+#options>div {
     cursor: default;
     padding: calc(var(--vw) * 1.5);
 }
 
-#options > div:not(:first-child)
-{
+#options>div:not(:first-child) {
     border-top: calc(var(--vw) * 0.2) solid gray;
 }
 
-#board
-{
+#board {
     width: calc(4 * 24 * var(--vw));
     height: calc(5 * 24 * var(--vw));
     font-size: calc(4 * var(--vw));
-    margin: auto;
+    margin-inline: auto;
     position: relative;
 }
 
-.cell
-{
+.cell {
     width: 25%;
     height: 20%;
     top: calc(100% / 5 / 2 * var(--y));
@@ -177,8 +144,7 @@ body > div:last-child
     position: absolute;
 }
 
-.room
-{
+.room {
     width: calc(50% * 1.4142 - (var(--vw) * 0.125));
     height: calc(50% * 1.4142 - (var(--vw) * 0.125));
     border: calc(var(--vw) * 0.25) solid black;
@@ -193,8 +159,7 @@ body > div:last-child
     transform: rotate(45deg);
 }
 
-.piece
-{
+.piece {
     width: 50%;
     height: 50%;
     border-radius: 50%;
@@ -209,32 +174,27 @@ body > div:last-child
     background-size: 100% 100%;
 }
 
-.piece[data-color="bn"]
-{
+.piece[data-color="bn"] {
     background-image: url(pieces/bn.png);
     box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.piece[data-color="bq"]
-{
+.piece[data-color="bq"] {
     background-image: url(pieces/bq.png);
     box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.piece[data-color="wn"]
-{
+.piece[data-color="wn"] {
     background-image: url(pieces/wn.png);
     box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.piece[data-color="wq"]
-{
+.piece[data-color="wq"] {
     background-image: url(pieces/wq.png);
     box-shadow: 0 0 calc(3 * var(--vw)) black;
 }
 
-.text
-{
+.text {
     width: 50%;
     height: 50%;
     z-index: 300;

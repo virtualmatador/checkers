@@ -9,7 +9,7 @@
 
 main::Menu::Menu()
 {
-    handlers_["body"] = [&](const char* command, const char* info)
+    handlers_["body"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -32,16 +32,20 @@ main::Menu::Menu()
             js.clear();
             js << "setSound(" << (data_.sound_ ? "true" : "false") << ");";
             bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            js << "setThumb(" << (data_.thumb_ ? "true" : "false") << ");";
+            bridge::CallFunction(js.str().c_str());
         }
     };
-    handlers_["play"] = [&](const char* command, const char* info)
+    handlers_["play"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
         else if (std::strcmp(command, "click") == 0)
             Play();
     };
-    handlers_["difficulty"] = [&](const char* command, const char* info)
+    handlers_["difficulty"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -61,7 +65,7 @@ main::Menu::Menu()
             }
         }
     };
-    handlers_["alter"] = [&](const char* command, const char* info)
+    handlers_["alter"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -81,7 +85,7 @@ main::Menu::Menu()
             }
         }
     };
-    handlers_["rotate"] = [&](const char* command, const char* info)
+    handlers_["rotate"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -101,7 +105,7 @@ main::Menu::Menu()
             }
         }
     };
-    handlers_["sound"] = [&](const char* command, const char* info)
+    handlers_["sound"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -121,7 +125,27 @@ main::Menu::Menu()
             }
         }
     };
-    handlers_["reset"] = [&](const char* command, const char* info)
+    handlers_["thumb"] = [&](const char *command, const char *info)
+    {
+        if (std::strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "click") == 0)
+        {
+            if (std::strlen(info) == 0)
+            {
+                return;
+            }
+            else if (std::strcmp(info, "true") == 0)
+            {
+                data_.thumb_ = true;
+            }
+            else if (std::strcmp(info, "false") == 0)
+            {
+                data_.thumb_ = false;
+            }
+        }
+    };
+    handlers_["reset"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
         {
@@ -134,9 +158,9 @@ main::Menu::Menu()
         }
     };
     bridge::LoadView(index_,
-        (std::int32_t)core::VIEW_INFO::Default |
-        (std::int32_t) core::VIEW_INFO::AudioNoSolo,
-        "menu");
+                     (std::int32_t)core::VIEW_INFO::Default |
+                         (std::int32_t)core::VIEW_INFO::AudioNoSolo,
+                     "menu");
 }
 
 main::Menu::~Menu()
@@ -154,7 +178,7 @@ void main::Menu::Play()
     bridge::NeedRestart();
 }
 
-void main::Menu::FeedUri(const char* uri, std::function<void(
-    const std::vector<unsigned char>&)>&& consume)
+void main::Menu::FeedUri(const char *uri, std::function<void(
+                                              const std::vector<unsigned char> &)> &&consume)
 {
 }

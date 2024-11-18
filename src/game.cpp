@@ -10,9 +10,9 @@
 #include "progress.h"
 
 main::Game::Game()
-    : stop_thinking_{ false }
+    : stop_thinking_{false}
 {
-    handlers_["body"] = [&](const char* command, const char* info)
+    handlers_["body"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -25,15 +25,13 @@ main::Game::Game()
             for (std::size_t i = 0; i < Board::cell_count_; ++i)
             {
                 std::ostringstream js;
-                js << "createCell(" << i << "," << Board::get_column(i) <<
-                    "," << Board::get_row(i) <<
-                    "," << Board::get_row(i) % 2 << ");";
+                js << "createCell(" << i << "," << Board::get_column(i) << "," << Board::get_row(i) << "," << Board::get_row(i) % 2 << ");";
                 bridge::CallFunction(js.str().c_str());
             }
             reset_board();
         }
     };
-    handlers_["game"] = [&](const char* command, const char* info)
+    handlers_["game"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -112,7 +110,7 @@ main::Game::Game()
             }
         }
     };
-    handlers_["cell"] = [&](const char* command, const char* info)
+    handlers_["cell"] = [&](const char *command, const char *info)
     {
         if (std::strlen(command) == 0)
             return;
@@ -164,9 +162,7 @@ main::Game::Game()
             }
         }
     };
-    bridge::LoadView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo |
-        (std::int32_t)core::VIEW_INFO::Portrait |
-        (std::int32_t)core::VIEW_INFO::ScreenOn, "game");
+    bridge::LoadView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo | (std::int32_t)core::VIEW_INFO::Portrait | (std::int32_t)core::VIEW_INFO::ScreenOn, "game");
 }
 
 main::Game::~Game()
@@ -180,7 +176,7 @@ void main::Game::Escape()
     bridge::NeedRestart();
 }
 
-void main::Game::play_audio(const char* audio)
+void main::Game::play_audio(const char *audio)
 {
     if (data_.sound_)
     {
@@ -221,6 +217,10 @@ void main::Game::set_preferences()
     js.clear();
     js << "setRotate(" << (data_.rotate_ ? "true" : "false") << ");";
     bridge::CallFunction(js.str().c_str());
+    js.str("");
+    js.clear();
+    js << "setThumb(" << (data_.thumb_ ? "true" : "false") << ");";
+    bridge::CallFunction(js.str().c_str());
 }
 
 void main::Game::validate_move()
@@ -228,13 +228,13 @@ void main::Game::validate_move()
     if (!guesser_.joinable())
     {
         data_.board_.traced_ = false;
-        for (const auto& board : boards_)
+        for (const auto &board : boards_)
         {
             bool valid_move = board.moves_.size() == data_.board_.moves_.size();
             if (valid_move)
             {
                 for (std::size_t i = 0;
-                    i < board.moves_.size(); ++i)
+                     i < board.moves_.size(); ++i)
                 {
                     if (board.moves_[i] != data_.board_.moves_[i])
                     {
@@ -257,9 +257,9 @@ void main::Game::update_view()
 {
     for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        int piece = (!data_.board_.fulls_.test(i) ? 0 :
-            data_.board_.humans_.test(i) ? -1 : 1) *
-            (data_.board_.queens_.test(i) ? 2 : 1);
+        int piece = (!data_.board_.fulls_.test(i) ? 0 : data_.board_.humans_.test(i) ? -1
+                                                                                     : 1) *
+                    (data_.board_.queens_.test(i) ? 2 : 1);
         std::ostringstream js;
         js << "setPiece(" << i << "," << piece << ");";
         bridge::CallFunction(js.str().c_str());
@@ -267,8 +267,7 @@ void main::Game::update_view()
     for (std::size_t i = 0; i < data_.board_.moves_.size(); ++i)
     {
         std::ostringstream js;
-        js << "setOrder(" << (unsigned int)data_.board_.moves_[i] <<
-            "," << i << ");";
+        js << "setOrder(" << (unsigned int)data_.board_.moves_[i] << "," << i << ");";
         bridge::CallFunction(js.str().c_str());
     }
     int message = 0, go = 0;
@@ -383,7 +382,7 @@ void main::Game::think()
     data_.board_.traced_ = false;
     boards_.emplace_back(data_.board_);
     thinker_ = std::thread([this, index = index_]()
-    {
+                           {
         auto progress = boards_.begin();
         std::vector<std::thread> workers{ std::thread::hardware_concurrency() };
         std::size_t worker_count = 0;
@@ -490,24 +489,22 @@ void main::Game::think()
             }
             bridge::AsyncMessage(index, "game", "play", "");
         }
-        boards_.clear();
-    });
+        boards_.clear(); });
 }
 
 void main::Game::guess()
 {
     data_.board_.traced_ = false;
     guesser_ = std::thread([this, index = index_]()
-    {
+                           {
         boards_ = data_.board_.list_options();
         if (!stop_thinking_)
         {
             bridge::AsyncMessage(index, "game", "validate", "");
-        }
-    });
+        } });
 }
 
-void main::Game::FeedUri(const char* uri, std::function<void(
-    const std::vector<unsigned char>&)>&& consume)
+void main::Game::FeedUri(const char *uri, std::function<void(
+                                              const std::vector<unsigned char> &)> &&consume)
 {
 }

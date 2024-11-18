@@ -21,12 +21,13 @@ namespace main
         void reset_all();
         void reset_game();
         void switch_sides();
-    
+
     private:
         int difficulty_;
         bool alter_;
         bool rotate_;
         bool sound_;
+        bool thumb_;
         int game_over_;
         Board board_;
     };
@@ -34,4 +35,4 @@ namespace main
     extern Data data_;
 }
 
-#endif //SRC_DATA_H
+#endif // SRC_DATA_H
