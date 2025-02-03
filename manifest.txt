@@ -1,5 +1,5 @@
 target=Checkers
 identifier=com.shaidin.checkers
-version=1.14.14
+version=1.15.15
 internet=false
 guid=70332C05-4477-43ED-B0B9-70D5CE79F890
