@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include <locale>
+
 #include "data.h"
 #include "menu.h"
 #include "game.h"
@@ -9,6 +11,7 @@ main::PROGRESS main::progress_ = main::PROGRESS::MENU;
 
 void life_cycle::Begin()
 {
+    std::locale::global(std::locale::classic());
     main::data_.load();
 }
 
@@ -48,4 +51,3 @@ void life_cycle::Restart()
         break;
     }
 }
-
