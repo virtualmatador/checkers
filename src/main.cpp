@@ -17,6 +17,7 @@ void life_cycle::Begin()
 
 void life_cycle::End()
 {
+    core::Stage::stage_.reset();
     main::data_.save();
 }
 
@@ -40,6 +41,7 @@ void life_cycle::Stop()
 
 void life_cycle::Restart()
 {
+    core::Stage::stage_.reset();
     main::data_.save();
     switch (main::progress_)
     {
