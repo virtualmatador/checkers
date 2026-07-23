@@ -157,6 +157,21 @@ function setOrder(index, order) {
         text.innerText + ' ' : '') + order;
 }
 
+function setMoveGlow(lastMove, previousMove) {
+    var cells = document.getElementById('board').children;
+    Array.prototype.forEach.call(cells, function (cell) {
+        cell.classList.remove('last-move', 'previous-move');
+    });
+    if (previousMove >= 0) {
+        cells[rotateIndex(previousMove)].classList.add('previous-move');
+    }
+    if (lastMove >= 0) {
+        var cell = cells[rotateIndex(lastMove)];
+        cell.classList.remove('previous-move');
+        cell.classList.add('last-move');
+    }
+}
+
 function setGo(state) {
     var go = document.getElementById('go');
     switch (state) {

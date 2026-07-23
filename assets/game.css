@@ -159,6 +159,19 @@ body>div {
     transform: rotate(45deg);
 }
 
+.previous-move .piece[data-color] {
+    box-shadow:
+        0 0 calc(1.25 * var(--vw)) rgba(255, 215, 0, 0.55),
+        inset 0 0 calc(0.5 * var(--vw)) rgba(255, 215, 0, 0.3);
+}
+
+.last-move .piece[data-color] {
+    box-shadow:
+        0 0 calc(2.5 * var(--vw)) rgba(255, 215, 0, 0.95),
+        0 0 calc(4 * var(--vw)) rgba(255, 140, 0, 0.65),
+        inset 0 0 calc(0.75 * var(--vw)) rgba(255, 255, 255, 0.55);
+}
+
 .piece {
     width: 50%;
     height: 50%;

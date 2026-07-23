@@ -29,6 +29,8 @@ namespace main
         bool sound_;
         bool thumb_;
         int game_over_;
+        int last_move_;
+        int previous_move_;
         Board board_;
     };
 

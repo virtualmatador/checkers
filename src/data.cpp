@@ -28,6 +28,10 @@ void main::Data::load()
         toolbox::Load("OPTION_SOUND", sound_, false, false);
         toolbox::Load("OPTION_THUMB", thumb_, false, false);
         toolbox::Load("GAME_OVER", game_over_, 0, 4);
+        toolbox::Load("GAME_LAST_MOVE", last_move_,
+                      -1, (int)Board::cell_count_);
+        toolbox::Load("GAME_PREVIOUS_MOVE", previous_move_,
+                      -1, (int)Board::cell_count_);
         int moves_count;
         toolbox::Load("GAME_MOVES_COUNT", moves_count,
                       0, (int)Board::cell_count_ / 2);
@@ -83,6 +87,8 @@ void main::Data::save() const
     toolbox::Save("OPTION_SOUND", sound_);
     toolbox::Save("OPTION_THUMB", thumb_);
     toolbox::Save("GAME_OVER", game_over_);
+    toolbox::Save("GAME_LAST_MOVE", last_move_);
+    toolbox::Save("GAME_PREVIOUS_MOVE", previous_move_);
     toolbox::Save("GAME_MOVES_COUNT", board_.moves_.size());
     for (std::size_t i = 0; i < board_.moves_.size(); ++i)
     {
@@ -124,6 +130,8 @@ void main::Data::reset_all()
 void main::Data::reset_game()
 {
     game_over_ = 0;
+    last_move_ = -1;
+    previous_move_ = -1;
     board_.moves_.clear();
     board_.level_ = 0;
     board_.score_ = -1.0f;
@@ -152,6 +160,14 @@ void main::Data::switch_sides()
     for (auto &move : board_.moves_)
     {
         move = Board::cell_count_ - 1 - move;
+    }
+    if (last_move_ >= 0)
+    {
+        last_move_ = Board::cell_count_ - 1 - last_move_;
+    }
+    if (previous_move_ >= 0)
+    {
+        previous_move_ = Board::cell_count_ - 1 - previous_move_;
     }
     if (board_.level_ == 0)
     {

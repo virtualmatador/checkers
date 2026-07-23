@@ -270,6 +270,12 @@ void main::Game::update_view()
         js << "setOrder(" << (unsigned int)data_.board_.moves_[i] << "," << i << ");";
         bridge::CallFunction(js.str().c_str());
     }
+    {
+        std::ostringstream js;
+        js << "setMoveGlow(" << data_.last_move_ << ","
+           << data_.previous_move_ << ");";
+        bridge::CallFunction(js.str().c_str());
+    }
     int message = 0, go = 0;
     if (data_.game_over_ == 0)
     {
@@ -296,6 +302,8 @@ void main::Game::update_view()
 
 void main::Game::move_human()
 {
+    data_.previous_move_ = data_.last_move_;
+    data_.last_move_ = data_.board_.moves_.back();
     data_.board_.apply(best_board_);
     boards_.clear();
     data_.board_.level_ = 1;
@@ -313,6 +321,8 @@ void main::Game::move_human()
 
 void main::Game::move_cpu()
 {
+    data_.previous_move_ = data_.last_move_;
+    data_.last_move_ = data_.board_.moves_.back();
     data_.board_.apply(best_board_);
     data_.board_.level_ = 0;
     data_.board_.moves_.clear();
