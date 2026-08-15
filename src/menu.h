@@ -15,6 +15,7 @@ namespace main
             const std::vector<unsigned char>&)>&& consume) override;
 
     private:
+        void Attach() override;
         void Play();
     };
 }

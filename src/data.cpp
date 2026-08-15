@@ -34,7 +34,7 @@ void main::Data::load()
                       -1, (int)Board::cell_count_);
         int moves_count;
         toolbox::Load("GAME_MOVES_COUNT", moves_count,
-                      0, (int)Board::cell_count_ / 2);
+                      0, (int)Board::max_moves_ + 1);
         board_.moves_.clear();
         for (std::size_t i = 0; i < moves_count; ++i)
         {

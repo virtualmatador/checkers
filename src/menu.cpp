@@ -154,17 +154,20 @@ main::Menu::Menu()
         else if (std::strcmp(command, "click") == 0)
         {
             data_.reset_all();
-            bridge::NeedRestart();
+            RequestStage();
         }
     };
-    bridge::LoadView(index_,
-                     (std::int32_t)core::VIEW_INFO::Default |
-                         (std::int32_t)core::VIEW_INFO::AudioNoSolo,
-                     "menu");
 }
 
 main::Menu::~Menu()
 {
+}
+
+void main::Menu::Attach()
+{
+    bridge::SetAudioNoSolo(true);
+    bridge::SetLayout(false, false);
+    bridge::LoadView(Index(), "menu");
 }
 
 void main::Menu::Escape()
@@ -175,7 +178,7 @@ void main::Menu::Escape()
 void main::Menu::Play()
 {
     progress_ = PROGRESS::GAME;
-    bridge::NeedRestart();
+    RequestStage();
 }
 
 void main::Menu::FeedUri(const char *uri, std::function<void(

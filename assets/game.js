@@ -3,32 +3,47 @@ var rotate_ = false;
 
 var audios_ = [];
 const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+var audioCtx;
 
 function setup() {
     var ids =
         [
             'click', 'draw', 'lose', 'move', 'win'
         ];
-    var loaded = 0;
-    ids.forEach(function (id) {
-        var request = new XMLHttpRequest();
-        request.open('GET', cross_asset_domain_ + 'wave/' + id + '.wav', cross_asset_async_);
-        request.responseType = 'arraybuffer';
-        request.onload = function () {
-            var audioData = request.response;
-            audioCtx.decodeAudioData(audioData, function (buffer) {
-                audios_[id] = buffer;
-                if (++loaded == ids.length) {
-                    setTimeout(CallHandler, 0, 'body', 'setup', '');
-                }
-            });
-        };
-        request.send();
+    if (AudioContext) {
+        audioCtx = new AudioContext();
+    }
+    var loads = ids.map(function (id) {
+        if (!audioCtx) {
+            return Promise.reject();
+        }
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open('GET', cross_asset_domain_ + 'wave/' + id + '.wav',
+                cross_asset_async_);
+            request.responseType = 'arraybuffer';
+            request.onload = function () {
+                audioCtx.decodeAudioData(request.response, function (buffer) {
+                    audios_[id] = buffer;
+                    resolve();
+                }, reject);
+            };
+            request.onerror = reject;
+            request.send();
+        });
+    });
+    Promise.allSettled(loads).then(function () {
+        CallHandler('body', 'setup', '');
     });
 }
 
 function playAudio(id) {
+    if (!audioCtx || !audios_[id]) {
+        return;
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
     var source = audioCtx.createBufferSource();
     source.buffer = audios_[id];
     source.connect(audioCtx.destination);

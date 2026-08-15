@@ -13,6 +13,13 @@ namespace main
 {
     class Game: public core::Stage
     {
+        enum class Work
+        {
+            None,
+            Think,
+            Guess
+        };
+
     public:
         Game();
         ~Game();
@@ -21,6 +28,9 @@ namespace main
             const std::vector<unsigned char>&)>&& consume) override;
 
     private:
+        void Attach() override;
+        void Resume() override;
+        void Suspend() override;
         void play_audio(const char* audio);
         void reset_board();
         void set_preferences();
@@ -42,6 +52,8 @@ namespace main
         std::thread thinker_;
         std::thread guesser_;
         std::atomic<bool> stop_thinking_;
+        std::atomic<Work> notified_work_{Work::None};
+        Work suspended_work_ = Work::None;
     };
 }
 

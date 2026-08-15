@@ -61,7 +61,16 @@ main::Game::Game()
         }
         else if (std::strcmp(command, "validate") == 0)
         {
-            guesser_.join();
+            // Ignore a completion left behind by canceled work.
+            if (notified_work_ != Work::Guess)
+            {
+                return;
+            }
+            if (guesser_.joinable())
+            {
+                guesser_.join();
+            }
+            notified_work_ = Work::None;
             if (!boards_.empty())
             {
                 validate_move();
@@ -74,7 +83,16 @@ main::Game::Game()
         }
         else if (std::strcmp(command, "play") == 0)
         {
-            thinker_.join();
+            // Ignore a completion left behind by canceled work.
+            if (notified_work_ != Work::Think)
+            {
+                return;
+            }
+            if (thinker_.joinable())
+            {
+                thinker_.join();
+            }
+            notified_work_ = Work::None;
             data_.board_.moves_ = best_board_.moves_;
             if (data_.board_.moves_.empty())
             {
@@ -162,7 +180,6 @@ main::Game::Game()
             }
         }
     };
-    bridge::LoadView(index_, (std::int32_t)core::VIEW_INFO::AudioNoSolo | (std::int32_t)core::VIEW_INFO::Portrait | (std::int32_t)core::VIEW_INFO::ScreenOn, "game");
 }
 
 main::Game::~Game()
@@ -170,10 +187,55 @@ main::Game::~Game()
     join_threads();
 }
 
+void main::Game::Attach()
+{
+    // A newly loaded view starts its worker from the setup handler.
+    suspended_work_ = Work::None;
+    notified_work_ = Work::None;
+    bridge::SetAudioNoSolo(true);
+    bridge::SetLayout(true, false);
+    bridge::LoadView(Index(), "game");
+}
+
+void main::Game::Resume()
+{
+    bridge::SetScreenOn(true);
+    const Work work = suspended_work_;
+    suspended_work_ = Work::None;
+    if (work == Work::Think)
+    {
+        think();
+    }
+    else if (work == Work::Guess)
+    {
+        guess();
+    }
+}
+
+void main::Game::Suspend()
+{
+    bridge::SetScreenOn(false);
+    suspended_work_ = Work::None;
+    if (thinker_.joinable())
+    {
+        suspended_work_ = Work::Think;
+    }
+    else if (guesser_.joinable())
+    {
+        suspended_work_ = Work::Guess;
+    }
+    join_threads();
+    // The runtime queues completions posted just before suspension.
+    if (notified_work_ != Work::None)
+    {
+        suspended_work_ = Work::None;
+    }
+}
+
 void main::Game::Escape()
 {
     main::progress_ = PROGRESS::MENU;
-    bridge::NeedRestart();
+    RequestStage();
 }
 
 void main::Game::play_audio(const char *audio)
@@ -370,19 +432,13 @@ void main::Game::game_over()
 void main::Game::join_threads()
 {
     stop_thinking_ = true;
-    if (data_.board_.is_human())
+    if (guesser_.joinable())
     {
-        if (guesser_.joinable())
-        {
-            guesser_.join();
-        }
+        guesser_.join();
     }
-    else
+    if (thinker_.joinable())
     {
-        if (thinker_.joinable())
-        {
-            thinker_.join();
-        }
+        thinker_.join();
     }
     stop_thinking_ = false;
 }
@@ -391,7 +447,8 @@ void main::Game::think()
 {
     data_.board_.traced_ = false;
     boards_.emplace_back(data_.board_);
-    thinker_ = std::thread([this, index = index_]()
+    notified_work_ = Work::None;
+    thinker_ = std::thread([this, index = Index()]()
                            {
         auto progress = boards_.begin();
         std::vector<std::thread> workers{ std::thread::hardware_concurrency() };
@@ -497,6 +554,7 @@ void main::Game::think()
             {
                 best_board_.moves_.clear();
             }
+            notified_work_ = Work::Think;
             bridge::AsyncMessage(index, "game", "play", "");
         }
         boards_.clear(); });
@@ -505,11 +563,13 @@ void main::Game::think()
 void main::Game::guess()
 {
     data_.board_.traced_ = false;
-    guesser_ = std::thread([this, index = index_]()
+    notified_work_ = Work::None;
+    guesser_ = std::thread([this, index = Index()]()
                            {
         boards_ = data_.board_.list_options();
         if (!stop_thinking_)
         {
+            notified_work_ = Work::Guess;
             bridge::AsyncMessage(index, "game", "validate", "");
         } });
 }
