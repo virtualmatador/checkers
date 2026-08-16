@@ -27,17 +27,24 @@
                     <option value="4">Master</option>
                 </select>
                 <br>
-                <input id="alter" type="checkbox" onclick="alter()"><label for="alter">Play as Dark</label>
+                <input id="alter" type="checkbox" onclick="alter()">
+                <label for="alter">Play as Dark</label>
                 <br>
-                <input id="rotate" type="checkbox" onclick="rotate()"><label for="rotate">Play Downward</label>
+                <input id="rotate" type="checkbox" onclick="rotate()">
+                <label for="rotate">Play Downward</label>
                 <br>
-                <input id="sound" type="checkbox" onclick="sound()"><label for="sound">Sound</label>
+                <input id="sound" type="checkbox" onclick="sound()">
+                <label for="sound">Sound</label>
                 <br>
-                <input id="thumb" type="checkbox" onclick="thumb()"><label for="thumb">Menu at Bottom</label>
+                <input id="highlight" type="checkbox" onclick="highlight()">
+                <label for="highlight">Show Available Moves</label>
                 <br>
-                <input id="highlight" type="checkbox" onclick="highlight()"><label for="highlight">Highlight Available Moves</label>
+                <input id="thumb" type="checkbox" onclick="thumb()">
+                <label for="thumb">Menu at Bottom</label>
                 <br>
-                <button onclick="reset()">Reset</button>
+                <button id="switch-sides" type="button" onclick="switchSides()" disabled>Switch Sides</button>
+                <br>
+                <button id="reset" type="button" onclick="reset()" disabled>Reset</button>
             </div>
         </div>
         <br>
@@ -153,16 +160,10 @@
                 <br>
                 It's a <b>tie</b> when there are no legal moves available.
             </p>
-            <h4>Game Menu</h4>
+            <h4>Game Controls</h4>
             <p>
-                While playing, press options button at the top-right of the page to open the pop-up menu.
-            </p>
-            <p>
-                <b>Pause:</b> Come back to thie page.
-                <br>
-                <b>Switch Sides:</b> Switch your pieces with the opponent's pieces.
-                <br>
-                <b>New Game:</b> Start a new game.
+                While playing, press the <b>&#10005;</b> button at the top-right of the page to return here. Your
+                game is saved and can be resumed with <b>Play</b>.
             </p>
             <h4>Options</h4>
             <p>
@@ -179,8 +180,22 @@
                 Check <b>Highlight Available Moves</b> to highlight the pieces and squares you can tap next. The default
                 is off.
                 <br>
+                Press <b>Switch Sides</b> to exchange your pieces and direction with the opponent.
+                <br>
                 Press <b>Reset</b> to clear all saved information. Both game data and settings will be cleared.
             </p>
+        </div>
+    </div>
+    <div id="confirmation" class="confirmation" hidden onclick="cancelConfirmationOnBackdrop(event)"
+        onkeydown="confirmationKeyDown(event)">
+        <div id="confirmation-panel" class="confirmation-panel" role="dialog" aria-modal="true" tabindex="-1"
+            aria-labelledby="confirmation-title" aria-describedby="confirmation-message">
+            <h3 id="confirmation-title">Confirm</h3>
+            <p id="confirmation-message"></p>
+            <div class="confirmation-actions">
+                <button id="confirmation-cancel" type="button" onclick="cancelConfirmation()">Cancel</button>
+                <button id="confirmation-accept" type="button" onclick="acceptConfirmation()">Continue</button>
+            </div>
         </div>
     </div>
 </body>

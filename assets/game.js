@@ -66,13 +66,9 @@ function setThumb(state) {
     if (state) {
         document.body.style.setProperty('justify-content', 'end');
         document.getElementById('header').style.order = 1;
-        document.getElementById('options').style.removeProperty('top');
-        document.getElementById('options').style.bottom = '125%';
     } else {
         document.body.style.setProperty('justify-content', 'start');
         document.getElementById('header').style.order = 0;
-        document.getElementById('options').style.top = '125%';
-        document.getElementById('options').style.removeProperty('bottom');
     }
 }
 
@@ -121,18 +117,7 @@ function renderBoard(pieces, moves, availableMoves, lastMove, previousMove, mess
 }
 
 function stop() {
-    more();
     CallHandler("game", "stop", "");
-}
-
-function switchSides() {
-    more();
-    CallHandler("game", "switch", "");
-}
-
-function newGame() {
-    more();
-    CallHandler("game", "reset", "");
 }
 
 function gameOver(state) {
@@ -151,16 +136,6 @@ function gameOver(state) {
         case 3:
             banner.textContent = "Tie!";
             break;
-    }
-}
-
-function more() {
-    var options = document.getElementById("options");
-    if (options.style.display == "block") {
-        options.style.display = "none";
-    }
-    else {
-        options.style.display = "block";
     }
 }
 

@@ -40,6 +40,10 @@ main::Menu::Menu()
             js.clear();
             js << "setHighlight(" << (data_.highlight_ ? "true" : "false") << ");";
             bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            js << "setGameOver(" << data_.game_over_ << ");";
+            bridge::CallFunction(js.str().c_str());
         }
     };
     handlers_["play"] = [&](const char *command, const char *info)
@@ -179,6 +183,18 @@ main::Menu::Menu()
         else if (std::strcmp(command, "click") == 0)
         {
             data_.reset_all();
+            RequestStage();
+        }
+    };
+    handlers_["switch"] = [&](const char *command, const char *info)
+    {
+        if (std::strlen(command) == 0)
+        {
+            return;
+        }
+        else if (std::strcmp(command, "click") == 0)
+        {
+            data_.switch_sides();
             RequestStage();
         }
     };

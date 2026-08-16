@@ -38,26 +38,6 @@ main::Game::Game()
         {
             Escape();
         }
-        else if (std::strcmp(command, "reset") == 0)
-        {
-            if (data_.game_over_ == 0)
-            {
-                play_audio("lose");
-                join_threads();
-            }
-            data_.reset_game();
-            reset_board();
-        }
-        else if (std::strcmp(command, "switch") == 0)
-        {
-            if (data_.game_over_ == 0)
-            {
-                play_audio("click");
-                join_threads();
-            }
-            data_.switch_sides();
-            reset_board();
-        }
         else if (std::strcmp(command, "validate") == 0)
         {
             // Ignore a completion left behind by canceled work.
