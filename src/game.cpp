@@ -22,12 +22,10 @@ main::Game::Game()
         }
         else if (std::strcmp(command, "setup") == 0)
         {
-            for (std::size_t i = 0; i < Board::cell_count_; ++i)
-            {
-                std::ostringstream js;
-                js << "createCell(" << i << "," << Board::get_column(i) << "," << Board::get_row(i) << "," << Board::get_row(i) % 2 << ");";
-                bridge::CallFunction(js.str().c_str());
-            }
+            std::ostringstream js;
+            js << "createBoard(" << Board::last_row_ << ","
+               << Board::cell_count_ << ");";
+            bridge::CallFunction(js.str().c_str());
             reset_board();
         }
     };
@@ -109,7 +107,8 @@ main::Game::Game()
         {
             if (data_.game_over_ == 0)
             {
-                if (!data_.board_.moves_.empty())
+                if (data_.board_.traced_ &&
+                    !data_.board_.moves_.empty())
                 {
                     if (data_.board_.level_ == 0)
                     {
@@ -146,21 +145,19 @@ main::Game::Game()
                 }
                 else
                 {
-                    if (data_.board_.fulls_.test(index))
+                    if (data_.board_.fulls_.test(index) &&
+                        data_.board_.humans_.test(index))
                     {
-                        if (data_.board_.humans_.test(index))
+                        if (!data_.board_.moves_.empty() &&
+                            data_.board_.moves_[0] != index)
                         {
-                            if (!data_.board_.moves_.empty() &&
-                                data_.board_.moves_[0] != index)
-                            {
-                                data_.board_.moves_.clear();
-                            }
-                            if (data_.board_.moves_.size() < Board::max_moves_)
-                            {
-                                data_.board_.moves_.emplace_back(index);
-                                validate_move();
-                                play_audio("click");
-                            }
+                            data_.board_.moves_.clear();
+                        }
+                        if (data_.board_.moves_.size() < Board::max_moves_)
+                        {
+                            data_.board_.moves_.emplace_back(index);
+                            validate_move();
+                            play_audio("click");
                         }
                     }
                     else
@@ -317,27 +314,6 @@ void main::Game::validate_move()
 
 void main::Game::update_view()
 {
-    for (std::size_t i = 0; i < Board::cell_count_; ++i)
-    {
-        int piece = (!data_.board_.fulls_.test(i) ? 0 : data_.board_.humans_.test(i) ? -1
-                                                                                     : 1) *
-                    (data_.board_.queens_.test(i) ? 2 : 1);
-        std::ostringstream js;
-        js << "setPiece(" << i << "," << piece << ");";
-        bridge::CallFunction(js.str().c_str());
-    }
-    for (std::size_t i = 0; i < data_.board_.moves_.size(); ++i)
-    {
-        std::ostringstream js;
-        js << "setOrder(" << (unsigned int)data_.board_.moves_[i] << "," << i << ");";
-        bridge::CallFunction(js.str().c_str());
-    }
-    {
-        std::ostringstream js;
-        js << "setMoveGlow(" << data_.last_move_ << ","
-           << data_.previous_move_ << ");";
-        bridge::CallFunction(js.str().c_str());
-    }
     int message = 0, go = 0;
     if (data_.game_over_ == 0)
     {
@@ -350,16 +326,32 @@ void main::Game::update_view()
             message = data_.board_.is_human() ? 1 : 2;
         }
     }
+
+    std::ostringstream js;
+    js << "renderBoard([";
+    for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        std::ostringstream js;
-        js << "setMessage(" << message << ");";
-        bridge::CallFunction(js.str().c_str());
+        if (i != 0)
+        {
+            js << ",";
+        }
+        int piece = (!data_.board_.fulls_.test(i) ? 0 : data_.board_.humans_.test(i) ? -1
+                                                                                     : 1) *
+                    (data_.board_.queens_.test(i) ? 2 : 1);
+        js << piece;
     }
+    js << "],[";
+    for (std::size_t i = 0; i < data_.board_.moves_.size(); ++i)
     {
-        std::ostringstream js;
-        js << "setGo(" << go << ");";
-        bridge::CallFunction(js.str().c_str());
+        if (i != 0)
+        {
+            js << ",";
+        }
+        js << (unsigned int)data_.board_.moves_[i];
     }
+    js << "]," << data_.last_move_ << "," << data_.previous_move_ << ","
+       << message << "," << go << ");";
+    bridge::CallFunction(js.str().c_str());
 }
 
 void main::Game::move_human()
@@ -451,7 +443,8 @@ void main::Game::think()
     thinker_ = std::thread([this, index = Index()]()
                            {
         auto progress = boards_.begin();
-        std::vector<std::thread> workers{ std::thread::hardware_concurrency() };
+        const auto concurrency = std::thread::hardware_concurrency();
+        std::vector<std::thread> workers(concurrency == 0 ? 1 : concurrency);
         std::size_t worker_count = 0;
         std::mutex boards_lock;
         std::condition_variable waker;
@@ -490,12 +483,18 @@ void main::Game::think()
                         job->score_ = job->is_human() ?
                             Board::win_score_ + 1.0f :
                             -1.0f;
-                        if (job->level_ == data_.difficulty_)
+                        if (job->level_ == data_.difficulty_ * 2)
                         {
                             for (auto it = options.begin();
                                 it != options.end();)
                             {
                                 it->evaluate();
+                                if (it->score_ != 0.0f &&
+                                    it->score_ != Board::win_score_ &&
+                                    !it->has_legal_move())
+                                {
+                                    it->score_ = 1.0f;
+                                }
                                 job->apply_score(*it);
                                 it = options.erase(it);
                             }

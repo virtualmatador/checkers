@@ -15,7 +15,7 @@ namespace main
         static const std::size_t cell_count_ = 32;
         static const std::size_t last_row_ = 4;
         static const std::size_t piece_count_ = 11;
-        static const std::size_t difficulty_limit_ = 9;
+        static const std::size_t difficulty_limit_ = 5;
         static const std::size_t max_moves_ = 13;
         static constexpr float win_score_ = 1000000.f;
 
@@ -23,6 +23,7 @@ namespace main
         Board();
         ~Board();
         std::list<Board> list_options();
+        bool has_legal_move() const;
         template<bool killer>
         void list_options(std::list<Board>& boards,
             const std::size_t& piece, bool human);
@@ -37,6 +38,8 @@ namespace main
             std::size_t no_mod, bool killer>
         void move(std::list<Board>& boards,
             const std::size_t& piece, bool human);
+        template<bool forward, std::size_t movement, std::size_t no_mod>
+        bool has_move(const std::size_t& piece, bool human) const;
         template<bool killer>
         void add_option(std::list<Board>& boards, const std::size_t& piece,
             const std::size_t& victum, const std::size_t& cell, bool human);

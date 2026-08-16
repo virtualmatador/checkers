@@ -21,10 +21,10 @@
                 <br>
                 <label for="difficulty">Difficulty:</label>
                 <select id="difficulty" onchange="difficulty()">
-                    <option>Easy</option>
-                    <option>Normal</option>
-                    <option>Difficult</option>
-                    <option>Master</option>
+                    <option value="1">Easy</option>
+                    <option value="2">Normal</option>
+                    <option value="3">Difficult</option>
+                    <option value="4">Master</option>
                 </select>
                 <br>
                 <input id="alter" type="checkbox" onclick="alter()"><label for="alter">Play as Dark</label>
@@ -137,6 +137,10 @@
                 <li>
                     If your input is legal, the <b>Go</b> button will replace <b>Your Turn</b>. Tap it to apply your
                     move.
+                </li>
+                <li>
+                    After the opponent finishes thinking, its numbered move is displayed and the <b>OK</b> button
+                    replaces <b>Wait</b>. Tap <b>OK</b> to apply the opponent's move.
                 </li>
             </ul>
             <h4>End of Game</h4>

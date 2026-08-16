@@ -97,6 +97,28 @@ function createCell(index, x, y, shift) {
     document.getElementById('board').appendChild(cell);
 }
 
+function createBoard(lastRow, cellCount) {
+    var rowWidth = lastRow * 2 - 1;
+    for (var index = 0; index < cellCount; ++index) {
+        var y = Math.floor(index / rowWidth) * 2 +
+            Math.floor(index % rowWidth / lastRow);
+        var x = index % rowWidth % lastRow;
+        createCell(index, x, y, y % 2);
+    }
+}
+
+function renderBoard(pieces, moves, lastMove, previousMove, message, goState) {
+    pieces.forEach(function (piece, index) {
+        setPiece(index, piece);
+    });
+    moves.forEach(function (cell, order) {
+        setOrder(cell, order);
+    });
+    setMoveGlow(lastMove, previousMove);
+    setMessage(message);
+    setGo(goState);
+}
+
 function stop() {
     more();
     CallHandler("game", "stop", "");
@@ -126,7 +148,7 @@ function gameOver(state) {
             banner.textContent = "Game Over!";
             break;
         case 3:
-            banner.textContent = "Locked!";
+            banner.textContent = "Tie!";
             break;
     }
 }

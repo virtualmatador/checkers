@@ -54,6 +54,32 @@ std::list<main::Board> main::Board::list_options()
     return options;
 }
 
+bool main::Board::has_legal_move() const
+{
+    const bool human = is_human();
+    for (std::size_t piece = 0; piece < cell_count_; ++piece)
+    {
+        if (!fulls_.test(piece) || humans_.test(piece) != human)
+        {
+            continue;
+        }
+        const bool queen = queens_.test(piece);
+        if ((human || queen) && (
+            has_move<false, last_row_, 0>(piece, human) ||
+            has_move<false, last_row_ - 1, last_row_ - 1>(piece, human)))
+        {
+            return true;
+        }
+        if ((!human || queen) && (
+            has_move<true, last_row_, last_row_ - 1>(piece, human) ||
+            has_move<true, last_row_ - 1, 0>(piece, human)))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 template<bool killer>
 void main::Board::list_options(std::list<Board>& boards,
     const std::size_t& piece, bool human)
@@ -146,19 +172,70 @@ void main::Board::move(std::list<Board>& boards,
     }
 }
 
+template<bool forward, std::size_t movement, std::size_t no_mod>
+bool main::Board::has_move(const std::size_t& piece, bool human) const
+{
+    std::size_t cell = piece;
+    const auto can_advance = [&]()
+    {
+        if constexpr(forward)
+        {
+            return cell <= cell_count_ - 1 - last_row_;
+        }
+        else
+        {
+            return cell >= last_row_;
+        }
+    };
+    const auto advance = [&]()
+    {
+        if constexpr(forward)
+        {
+            cell += movement;
+        }
+        else
+        {
+            cell -= movement;
+        }
+    };
+
+    if (!can_advance() || cell % (last_row_ * 2 - 1) == no_mod)
+    {
+        return false;
+    }
+    advance();
+    if (!fulls_.test(cell))
+    {
+        return true;
+    }
+    if (humans_.test(cell) == human || !can_advance() ||
+        cell % (last_row_ * 2 - 1) == no_mod)
+    {
+        return false;
+    }
+    advance();
+    return !fulls_.test(cell);
+}
+
 template<bool killer>
 void main::Board::add_option(std::list<Board>& boards, const std::size_t& piece,
     const std::size_t& victum, const std::size_t& cell, bool human)
 {
-    auto board = *this;
+    Board board;
     if constexpr(killer)
     {
+        board = *this;
         board.parent_ = parent_;
     }
     else
     {
+        board.fulls_ = fulls_;
+        board.humans_ = humans_;
+        board.queens_ = queens_;
+        board.score_ = score_;
+        board.score_level_ = score_level_;
+        board.level_ = level_;
         board.parent_ = this;
-        board.moves_.clear();
         ++board.level_;
         if (!board.parent_->parent_)
         {
@@ -288,8 +365,8 @@ void main::Board::apply_score(const Board& board)
     else
     {
         if (score_ > board.score_ || (score_ == board.score_ && (
-            (score_level_ < board.score_level_ && score_ < 1.0) ||
-            (score_level_ > board.score_level_ && score_ > 1.0))))
+            (score_level_ > board.score_level_ && score_ < 1.0) ||
+            (score_level_ < board.score_level_ && score_ > 1.0))))
         {
             score_ = board.score_;
             score_level_ = board.score_level_;

@@ -58,7 +58,8 @@ main::Menu::Menu()
             else
             {
                 std::size_t difficulty = std::strtoul(info, nullptr, 10);
-                if (difficulty < Board::difficulty_limit_)
+                if (difficulty > 0 &&
+                    difficulty < Board::difficulty_limit_)
                 {
                     data_.difficulty_ = difficulty;
                 }
