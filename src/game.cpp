@@ -1,3 +1,4 @@
+#include <bitset>
 #include <condition_variable>
 #include <cstring>
 #include <list>
@@ -315,6 +316,7 @@ void main::Game::validate_move()
 void main::Game::update_view()
 {
     int message = 0, go = 0;
+    std::bitset<Board::cell_count_> available_moves;
     if (data_.game_over_ == 0)
     {
         if (data_.board_.traced_)
@@ -324,6 +326,32 @@ void main::Game::update_view()
         else
         {
             message = data_.board_.is_human() ? 1 : 2;
+        }
+
+        if (data_.highlight_ && data_.board_.is_human() &&
+            !guesser_.joinable())
+        {
+            const auto selected = data_.board_.moves_.size();
+            for (const auto &board : boards_)
+            {
+                if (selected >= board.moves_.size())
+                {
+                    continue;
+                }
+                bool matches = true;
+                for (std::size_t i = 0; i < selected; ++i)
+                {
+                    if (data_.board_.moves_[i] != board.moves_[i])
+                    {
+                        matches = false;
+                        break;
+                    }
+                }
+                if (matches)
+                {
+                    available_moves.set(board.moves_[selected]);
+                }
+            }
         }
     }
 
@@ -348,6 +376,20 @@ void main::Game::update_view()
             js << ",";
         }
         js << (unsigned int)data_.board_.moves_[i];
+    }
+    js << "],[";
+    bool first_available = true;
+    for (std::size_t i = 0; i < available_moves.size(); ++i)
+    {
+        if (available_moves.test(i))
+        {
+            if (!first_available)
+            {
+                js << ",";
+            }
+            js << i;
+            first_available = false;
+        }
     }
     js << "]," << data_.last_move_ << "," << data_.previous_move_ << ","
        << message << "," << go << ");";

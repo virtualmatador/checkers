@@ -107,13 +107,14 @@ function createBoard(lastRow, cellCount) {
     }
 }
 
-function renderBoard(pieces, moves, lastMove, previousMove, message, goState) {
+function renderBoard(pieces, moves, availableMoves, lastMove, previousMove, message, goState) {
     pieces.forEach(function (piece, index) {
         setPiece(index, piece);
     });
     moves.forEach(function (cell, order) {
         setOrder(cell, order);
     });
+    setAvailableMoves(availableMoves);
     setMoveGlow(lastMove, previousMove);
     setMessage(message);
     setGo(goState);
@@ -192,6 +193,16 @@ function setOrder(index, order) {
         .children[rotateIndex(index)].children[2];
     text.innerText = (text.innerText ?
         text.innerText + ' ' : '') + order;
+}
+
+function setAvailableMoves(indices) {
+    var cells = document.getElementById('board').children;
+    Array.prototype.forEach.call(cells, function (cell) {
+        cell.classList.remove('available-move');
+    });
+    indices.forEach(function (index) {
+        cells[rotateIndex(index)].classList.add('available-move');
+    });
 }
 
 function setMoveGlow(lastMove, previousMove) {

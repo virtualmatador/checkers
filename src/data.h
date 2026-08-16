@@ -28,6 +28,7 @@ namespace main
         bool rotate_;
         bool sound_;
         bool thumb_;
+        bool highlight_;
         int game_over_;
         int last_move_;
         int previous_move_;

@@ -36,6 +36,10 @@ main::Menu::Menu()
             js.clear();
             js << "setThumb(" << (data_.thumb_ ? "true" : "false") << ");";
             bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            js << "setHighlight(" << (data_.highlight_ ? "true" : "false") << ");";
+            bridge::CallFunction(js.str().c_str());
         }
     };
     handlers_["play"] = [&](const char *command, const char *info)
@@ -143,6 +147,26 @@ main::Menu::Menu()
             else if (std::strcmp(info, "false") == 0)
             {
                 data_.thumb_ = false;
+            }
+        }
+    };
+    handlers_["highlight"] = [&](const char *command, const char *info)
+    {
+        if (std::strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "click") == 0)
+        {
+            if (std::strlen(info) == 0)
+            {
+                return;
+            }
+            else if (std::strcmp(info, "true") == 0)
+            {
+                data_.highlight_ = true;
+            }
+            else if (std::strcmp(info, "false") == 0)
+            {
+                data_.highlight_ = false;
             }
         }
     };

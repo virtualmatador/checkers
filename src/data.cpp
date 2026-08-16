@@ -27,6 +27,7 @@ void main::Data::load()
         toolbox::Load("OPTION_ROTATE", rotate_, false, false);
         toolbox::Load("OPTION_SOUND", sound_, false, false);
         toolbox::Load("OPTION_THUMB", thumb_, false, false);
+        toolbox::Load("OPTION_HIGHLIGHT", highlight_, false, false);
         toolbox::Load("GAME_OVER", game_over_, 0, 4);
         toolbox::Load("GAME_LAST_MOVE", last_move_,
                       -1, (int)Board::cell_count_);
@@ -86,6 +87,7 @@ void main::Data::save() const
     toolbox::Save("OPTION_ROTATE", rotate_);
     toolbox::Save("OPTION_SOUND", sound_);
     toolbox::Save("OPTION_THUMB", thumb_);
+    toolbox::Save("OPTION_HIGHLIGHT", highlight_);
     toolbox::Save("GAME_OVER", game_over_);
     toolbox::Save("GAME_LAST_MOVE", last_move_);
     toolbox::Save("GAME_PREVIOUS_MOVE", previous_move_);
@@ -124,6 +126,7 @@ void main::Data::reset_all()
     rotate_ = false;
     sound_ = false;
     thumb_ = false;
+    highlight_ = false;
     reset_game();
 }
 

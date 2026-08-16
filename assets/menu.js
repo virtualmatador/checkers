@@ -26,6 +26,10 @@ function setThumb(state) {
     document.getElementById("thumb").checked = state;
 }
 
+function setHighlight(state) {
+    document.getElementById("highlight").checked = state;
+}
+
 function difficulty() {
     CallHandler("difficulty", "click",
         document.getElementById("difficulty").value);
@@ -45,4 +49,8 @@ function sound() {
 
 function thumb() {
     CallHandler("thumb", "click", document.getElementById("thumb").checked.toString());
+}
+
+function highlight() {
+    CallHandler("highlight", "click", document.getElementById("highlight").checked.toString());
 }
