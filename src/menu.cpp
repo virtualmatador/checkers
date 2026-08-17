@@ -44,6 +44,15 @@ main::Menu::Menu()
             js.clear();
             js << "setGameOver(" << data_.game_over_ << ");";
             bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            if (data_.incompatible_save_)
+            {
+                js << "setSaveVersionError("
+                   << data_.incompatible_save_version_ << ","
+                   << Data::save_version_ << ");";
+                bridge::CallFunction(js.str().c_str());
+            }
         }
     };
     handlers_["play"] = [&](const char *command, const char *info)
@@ -59,6 +68,10 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             if (std::strlen(info) == 0)
             {
                 return;
@@ -80,6 +93,10 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             if (std::strlen(info) == 0)
             {
                 return;
@@ -100,6 +117,10 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             if (std::strlen(info) == 0)
             {
                 return;
@@ -120,6 +141,10 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             if (std::strlen(info) == 0)
             {
                 return;
@@ -140,6 +165,10 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             if (std::strlen(info) == 0)
             {
                 return;
@@ -160,6 +189,10 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             if (std::strlen(info) == 0)
             {
                 return;
@@ -194,6 +227,10 @@ main::Menu::Menu()
         }
         else if (std::strcmp(command, "click") == 0)
         {
+            if (data_.incompatible_save_)
+            {
+                return;
+            }
             data_.switch_sides();
             RequestStage();
         }
@@ -218,6 +255,10 @@ void main::Menu::Escape()
 
 void main::Menu::Play()
 {
+    if (data_.incompatible_save_)
+    {
+        return;
+    }
     progress_ = PROGRESS::GAME;
     RequestStage();
 }

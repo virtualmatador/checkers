@@ -52,8 +52,10 @@ function playAudio(id) {
 
 function setAlter(state) {
     alter_ = state;
-    document.getElementById('side-piece').setAttribute('src',
-        alter_ ? 'pieces/bn.png' : 'pieces/wn.png');
+    document.getElementById('board').setAttribute('data-human-dark', alter_ ? 'true' : 'false');
+    var piece = document.getElementById('side-piece');
+    piece.setAttribute('data-color', alter_ ? 'bn' : 'wn');
+    piece.setAttribute('aria-label', alter_ ? 'Dark piece' : 'Light piece');
 }
 
 function setRotate(state) {

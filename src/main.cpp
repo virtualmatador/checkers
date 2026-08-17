@@ -1,6 +1,8 @@
 #include "main.h"
 
+#include <istream>
 #include <locale>
+#include <ostream>
 
 #include "data.h"
 #include "menu.h"
@@ -9,16 +11,16 @@
 
 main::PROGRESS main::progress_ = main::PROGRESS::MENU;
 
-void application::Restore(Completion completion)
+void application::Restore(std::istream& input, Completion completion)
 {
     std::locale::global(std::locale::classic());
-    main::data_.load();
+    main::data_.load(input);
     completion();
 }
 
-void application::Checkpoint()
+void application::Checkpoint(std::ostream& output)
 {
-    main::data_.save();
+    main::data_.save(output);
 }
 
 std::unique_ptr<core::Stage> application::CreateStage()

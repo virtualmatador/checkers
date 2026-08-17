@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="menu.css">
     <script src="menu.js"></script>
     <title>Checkers</title>
@@ -17,7 +21,12 @@
         <br>
         <div>
             <div class="controls">
-                <button onclick="play()">Play</button>
+                <div id="save-version-error" class="save-error" role="alert" hidden>
+                    Saved data version <strong id="save-data-version"></strong> cannot be loaded.
+                    Expected version <strong id="save-expected-version"></strong>.
+                    Reset is required to continue.
+                </div>
+                <button id="play" onclick="play()">Play</button>
                 <br>
                 <label for="difficulty">Difficulty:</label>
                 <select id="difficulty" onchange="difficulty()">

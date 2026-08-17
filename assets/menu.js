@@ -2,13 +2,16 @@ var game_over_ = 0;
 var pending_action_ = "";
 var previous_focus_ = null;
 var action_submitted_ = false;
+var save_incompatible_ = false;
 
 function play() {
-    CallHandler("play", "click", "");
+    if (!save_incompatible_) {
+        CallHandler("play", "click", "");
+    }
 }
 
 function reset() {
-    if (game_over_ !== 0) {
+    if (save_incompatible_ || game_over_ !== 0) {
         submitAction("reset");
     }
     else {
@@ -22,7 +25,19 @@ function switchSides() {
 
 function setGameOver(state) {
     game_over_ = state;
-    document.getElementById("switch-sides").disabled = false;
+    document.getElementById("switch-sides").disabled = save_incompatible_;
+    document.getElementById("reset").disabled = false;
+}
+
+function setSaveVersionError(dataVersion, expectedVersion) {
+    save_incompatible_ = true;
+    document.getElementById("save-data-version").textContent = dataVersion;
+    document.getElementById("save-expected-version").textContent = expectedVersion;
+    document.getElementById("save-version-error").hidden = false;
+    ["play", "difficulty", "alter", "rotate", "sound", "highlight", "thumb", "switch-sides"]
+        .forEach(function(id) {
+            document.getElementById(id).disabled = true;
+        });
     document.getElementById("reset").disabled = false;
 }
 

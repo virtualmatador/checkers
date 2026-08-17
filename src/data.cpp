@@ -1,15 +1,15 @@
-#include <iostream>
-#include <sstream>
-
-#include "bridge.h"
-
 #include "data.h"
 
-#include "toolbox.hpp"
+#include <iomanip>
+#include <ios>
+#include <istream>
+#include <ostream>
 
 main::Data main::data_;
 
 main::Data::Data()
+    : incompatible_save_{ false }
+    , incompatible_save_version_{ save_version_ }
 {
 }
 
@@ -17,110 +17,184 @@ main::Data::~Data()
 {
 }
 
-void main::Data::load()
+void main::Data::load(std::istream& input)
 {
-    try
-    {
-        toolbox::Load("OPTION_DIFFICULTY", difficulty_,
-                      1, (int)Board::difficulty_limit_);
-        toolbox::Load("OPTION_ALTER", alter_, false, false);
-        toolbox::Load("OPTION_ROTATE", rotate_, false, false);
-        toolbox::Load("OPTION_SOUND", sound_, false, false);
-        toolbox::Load("OPTION_THUMB", thumb_, false, false);
-        toolbox::Load("OPTION_HIGHLIGHT", highlight_, false, false);
-        toolbox::Load("GAME_OVER", game_over_, 0, 4);
-        toolbox::Load("GAME_LAST_MOVE", last_move_,
-                      -1, (int)Board::cell_count_);
-        toolbox::Load("GAME_PREVIOUS_MOVE", previous_move_,
-                      -1, (int)Board::cell_count_);
-        int moves_count;
-        toolbox::Load("GAME_MOVES_COUNT", moves_count,
-                      0, (int)Board::max_moves_ + 1);
-        board_.moves_.clear();
-        for (std::size_t i = 0; i < moves_count; ++i)
-        {
-            std::ostringstream composer;
-            int buffer;
-            composer << "GAME_MOVES_" << i;
-            toolbox::Load(composer.str().c_str(), buffer,
-                          0, (int)Board::cell_count_);
-            board_.moves_.emplace_back((unsigned char)buffer);
-        }
-        int level;
-        toolbox::Load("GAME_LEVEL", level, 0, 2);
-        board_.level_ = (unsigned char)level;
-        for (std::size_t i = 0; i < board_.fulls_.size(); ++i)
-        {
-            std::ostringstream composer;
-            bool buffer;
-            composer << "GAME_FULL_" << i;
-            toolbox::Load(composer.str().c_str(), buffer, false, false);
-            board_.fulls_.set(i, buffer);
-        }
-        for (std::size_t i = 0; i < board_.humans_.size(); ++i)
-        {
-            std::ostringstream composer;
-            bool buffer;
-            composer << "GAME_HUMAN_" << i;
-            toolbox::Load(composer.str().c_str(), buffer, false, false);
-            board_.humans_.set(i, buffer);
-        }
-        for (std::size_t i = 0; i < board_.queens_.size(); ++i)
-        {
-            std::ostringstream composer;
-            bool buffer;
-            composer << "GAME_QUEEN_" << i;
-            toolbox::Load(composer.str().c_str(), buffer, false, false);
-            board_.queens_.set(i, buffer);
-        }
-    }
-    catch (...)
+    input >> std::dec >> std::noboolalpha >> std::skipws;
+    int version = 0;
+    if (!(input >> version))
     {
         reset_all();
+        return;
+    }
+
+    if (version != save_version_)
+    {
+        if (convert(version, input))
+        {
+            incompatible_save_ = false;
+            incompatible_save_version_ = save_version_;
+            return;
+        }
+
+        reset_all();
+        incompatible_save_ = true;
+        incompatible_save_version_ = version;
+        return;
+    }
+
+    Data loaded;
+    int moves_count = 0;
+    bool valid = static_cast<bool>(
+        input >> loaded.difficulty_
+              >> loaded.alter_
+              >> loaded.rotate_
+              >> loaded.sound_
+              >> loaded.thumb_
+              >> loaded.highlight_
+              >> loaded.game_over_
+              >> loaded.last_move_
+              >> loaded.previous_move_
+              >> moves_count);
+
+    valid = valid && moves_count >= 0 &&
+        moves_count <= static_cast<int>(Board::max_moves_);
+    for (int i = 0; valid && i < moves_count; ++i)
+    {
+        int move = 0;
+        valid = static_cast<bool>(input >> move) && move >= 0 &&
+            move < static_cast<int>(Board::cell_count_);
+        if (valid)
+        {
+            loaded.board_.moves_.emplace_back(
+                static_cast<unsigned char>(move));
+        }
+    }
+
+    int level = 0;
+    if (valid)
+    {
+        valid = static_cast<bool>(input >> level) && level >= 0 && level < 2;
+        if (valid)
+        {
+            loaded.board_.level_ = static_cast<unsigned char>(level);
+        }
+    }
+
+    for (std::size_t i = 0; valid && i < Board::cell_count_; ++i)
+    {
+        bool value = false;
+        valid = static_cast<bool>(input >> value);
+        if (valid)
+        {
+            loaded.board_.fulls_.set(i, value);
+        }
+    }
+    for (std::size_t i = 0; valid && i < Board::cell_count_; ++i)
+    {
+        bool value = false;
+        valid = static_cast<bool>(input >> value);
+        if (valid)
+        {
+            loaded.board_.humans_.set(i, value);
+        }
+    }
+    for (std::size_t i = 0; valid && i < Board::cell_count_; ++i)
+    {
+        bool value = false;
+        valid = static_cast<bool>(input >> value);
+        if (valid)
+        {
+            loaded.board_.queens_.set(i, value);
+        }
+    }
+
+    if (valid)
+    {
+        input >> std::ws;
+        valid = input.eof() && !input.bad();
+    }
+
+    valid = valid && loaded.difficulty_ >= 1 &&
+        loaded.difficulty_ < static_cast<int>(Board::difficulty_limit_) &&
+        loaded.game_over_ >= 0 && loaded.game_over_ < 4 &&
+        loaded.last_move_ >= -1 &&
+        loaded.last_move_ < static_cast<int>(Board::cell_count_) &&
+        loaded.previous_move_ >= -1 &&
+        loaded.previous_move_ < static_cast<int>(Board::cell_count_);
+    if (!valid)
+    {
+        reset_all();
+        return;
+    }
+
+    difficulty_ = loaded.difficulty_;
+    alter_ = loaded.alter_;
+    rotate_ = loaded.rotate_;
+    sound_ = loaded.sound_;
+    thumb_ = loaded.thumb_;
+    highlight_ = loaded.highlight_;
+    game_over_ = loaded.game_over_;
+    last_move_ = loaded.last_move_;
+    previous_move_ = loaded.previous_move_;
+    board_ = loaded.board_;
+    incompatible_save_ = false;
+    incompatible_save_version_ = save_version_;
+}
+
+bool main::Data::convert(int version, std::istream&)
+{
+    switch (version)
+    {
+    default:
+        return false;
     }
 }
 
-void main::Data::save() const
+void main::Data::save(std::ostream& output) const
 {
-    toolbox::Save("OPTION_DIFFICULTY", difficulty_);
-    toolbox::Save("OPTION_ALTER", alter_);
-    toolbox::Save("OPTION_ROTATE", rotate_);
-    toolbox::Save("OPTION_SOUND", sound_);
-    toolbox::Save("OPTION_THUMB", thumb_);
-    toolbox::Save("OPTION_HIGHLIGHT", highlight_);
-    toolbox::Save("GAME_OVER", game_over_);
-    toolbox::Save("GAME_LAST_MOVE", last_move_);
-    toolbox::Save("GAME_PREVIOUS_MOVE", previous_move_);
-    toolbox::Save("GAME_MOVES_COUNT", board_.moves_.size());
-    for (std::size_t i = 0; i < board_.moves_.size(); ++i)
+    if (incompatible_save_)
     {
-        std::ostringstream composer;
-        composer << "GAME_MOVES_" << i;
-        toolbox::Save(composer.str().c_str(), (unsigned int)board_.moves_[i]);
+        output.setstate(std::ios::failbit);
+        return;
     }
-    toolbox::Save("GAME_LEVEL", (unsigned int)board_.level_);
-    for (std::size_t i = 0; i < board_.fulls_.size(); ++i)
+
+    output << std::dec << std::noboolalpha << std::noshowbase <<
+        std::noshowpos;
+    output.width(0);
+    output << save_version_ << '\n'
+           << difficulty_ << '\n'
+           << alter_ << '\n'
+           << rotate_ << '\n'
+           << sound_ << '\n'
+           << thumb_ << '\n'
+           << highlight_ << '\n'
+           << game_over_ << '\n'
+           << last_move_ << '\n'
+           << previous_move_ << '\n'
+           << static_cast<unsigned int>(board_.moves_.size()) << '\n';
+    for (const auto move : board_.moves_)
     {
-        std::ostringstream composer;
-        composer << "GAME_FULL_" << i;
-        toolbox::Save(composer.str().c_str(), board_.fulls_.test(i));
+        output << static_cast<unsigned int>(move) << '\n';
     }
-    for (std::size_t i = 0; i < board_.humans_.size(); ++i)
+    output << static_cast<unsigned int>(board_.level_) << '\n';
+    for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        std::ostringstream composer;
-        composer << "GAME_HUMAN_" << i;
-        toolbox::Save(composer.str().c_str(), board_.humans_.test(i));
+        output << board_.fulls_.test(i) << '\n';
     }
-    for (std::size_t i = 0; i < board_.queens_.size(); ++i)
+    for (std::size_t i = 0; i < Board::cell_count_; ++i)
     {
-        std::ostringstream composer;
-        composer << "GAME_QUEEN_" << i;
-        toolbox::Save(composer.str().c_str(), board_.queens_.test(i));
+        output << board_.humans_.test(i) << '\n';
+    }
+    for (std::size_t i = 0; i < Board::cell_count_; ++i)
+    {
+        output << board_.queens_.test(i) << '\n';
     }
 }
 
 void main::Data::reset_all()
 {
+    incompatible_save_ = false;
+    incompatible_save_version_ = save_version_;
     difficulty_ = 2;
     alter_ = false;
     rotate_ = false;

@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="game.css">
     <script src="game.js"></script>
     <title>Checkers</title>
@@ -19,7 +23,7 @@
         </div>
         <div id="side">
             <div>Your Pieces:</div>
-            <img id="side-piece">
+            <span id="side-piece" role="img" aria-label="Light piece"></span>
             <div>Your Moves:</div>
             <img id="side-direction">
         </div>

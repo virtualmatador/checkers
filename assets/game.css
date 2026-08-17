@@ -11,13 +11,15 @@ html,
 body {
     height: 100%;
     margin: 0;
+    background: var(--page-background);
+    color: var(--text-color);
 }
 
 body {
     display: flex;
     gap: calc(6 * var(--vw));
     flex-flow: column;
-    background-color: slategray;
+    background-color: var(--page-background);
     text-align: center;
 }
 
@@ -41,12 +43,15 @@ body>div {
     display: inline-block;
     text-decoration: none;
     font-weight: bold;
-    color: midnightblue;
+    color: var(--accent-color);
 }
 
 #side-piece {
     width: calc(6 * var(--vw));
-    height: auto;
+    height: calc(6 * var(--vw));
+    display: inline-block;
+    flex: 0 0 auto;
+    position: relative;
 }
 
 #side-direction {
@@ -55,7 +60,7 @@ body>div {
 }
 
 #control>div {
-    border: calc(0.15 * var(--vw)) solid black;
+    border: calc(0.15 * var(--vw)) solid var(--strong-border-color);
     border-radius: calc(1 * var(--vw));
     width: calc(22 * var(--vw));
     padding: calc(1 * var(--vw));
@@ -69,31 +74,32 @@ body>div {
 #message {
     cursor: default;
     font-weight: bold;
-    color: white;
-    background-color: dimgray;
+    color: var(--message-text-color);
+    background-color: var(--message-background);
 }
 
 #go {
     cursor: default;
-    background-color: ivory;
+    color: var(--text-color);
+    background-color: var(--control-background);
 }
 
 #gameover {
     cursor: default;
     font-weight: bold;
-    color: white;
+    color: var(--status-text-color);
 }
 
 #gameover[data-show="1"] {
-    background-color: green;
+    background-color: var(--success-background);
 }
 
 #gameover[data-show="2"] {
-    background-color: red;
+    background-color: var(--danger-background);
 }
 
 #gameover[data-show="3"] {
-    background-color: goldenrod;
+    background-color: var(--draw-background);
 }
 
 .top-actions {
@@ -105,23 +111,23 @@ body>div {
     height: calc(6 * var(--vw));
     box-sizing: border-box;
     padding: 0;
-    border: calc(0.15 * var(--vw)) solid black;
+    border: calc(0.15 * var(--vw)) solid var(--strong-border-color);
     border-radius: calc(1 * var(--vw));
     font: inherit;
     font-size: calc(3 * var(--vw));
     line-height: 1;
-    color: black;
-    background: mintcream;
+    color: var(--text-color);
+    background: var(--control-background);
     cursor: default;
 }
 
 .back:active {
-    background: lightgray;
+    background: var(--control-active-background);
     transform: translateY(calc(0.2 * var(--vw)));
 }
 
 .back:focus-visible {
-    outline: calc(0.25 * var(--vw)) solid midnightblue;
+    outline: calc(0.25 * var(--vw)) solid var(--focus-color);
     outline-offset: calc(0.25 * var(--vw));
 }
 
@@ -131,6 +137,10 @@ body>div {
     font-size: calc(4 * var(--vw));
     margin-inline: auto;
     position: relative;
+}
+
+#board[data-human-dark="true"] {
+    --available-wave-color: var(--available-wave-dark-color);
 }
 
 .cell {
@@ -144,9 +154,9 @@ body>div {
 .room {
     width: calc(50% * 1.4142 - (var(--vw) * 0.125));
     height: calc(50% * 1.4142 - (var(--vw) * 0.125));
-    border: calc(var(--vw) * 0.25) solid black;
+    border: calc(var(--vw) * 0.25) solid var(--board-border-color);
     z-index: 100;
-    background-color: darkslategray;
+    background-color: var(--board-cell-background);
     position: absolute;
     margin: auto;
     top: 0;
@@ -154,23 +164,79 @@ body>div {
     bottom: 0;
     right: 0;
     transform: rotate(45deg);
+    overflow: hidden;
+    forced-color-adjust: none;
 }
 
-.available-move .room {
-    box-shadow: inset 0 0 calc(2 * var(--vw)) lime;
+.available-move .room::before {
+    --wave-gap: calc(1.6 * var(--vw));
+    --wave-width: max(1px, calc(0.18 * var(--vw)));
+    --wave-origin: max(var(--wave-width), calc(4.8 * var(--vw)));
+    --wave-softness: max(1px, calc(0.2 * var(--vw)));
+    content: "";
+    width: var(--wave-origin);
+    height: var(--wave-origin);
+    border-radius: 50%;
+    background-color: var(--board-cell-background);
+    box-shadow:
+        0 0 var(--wave-softness) 0 var(--board-cell-background),
+        0 0 var(--wave-softness) var(--wave-width) var(--available-wave-color),
+        0 0 var(--wave-softness) var(--wave-gap) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(var(--wave-gap) + var(--wave-width)) var(--available-wave-color),
+        0 0 var(--wave-softness) calc(2 * var(--wave-gap)) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(2 * var(--wave-gap) + var(--wave-width)) var(--available-wave-color),
+        0 0 var(--wave-softness) calc(3 * var(--wave-gap)) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(3 * var(--wave-gap) + var(--wave-width)) var(--available-wave-color),
+        0 0 var(--wave-softness) calc(4 * var(--wave-gap)) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(4 * var(--wave-gap) + var(--wave-width)) var(--available-wave-color),
+        0 0 var(--wave-softness) calc(5 * var(--wave-gap)) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(5 * var(--wave-gap) + var(--wave-width)) var(--available-wave-color),
+        0 0 var(--wave-softness) calc(6 * var(--wave-gap)) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(6 * var(--wave-gap) + var(--wave-width)) var(--available-wave-color),
+        0 0 var(--wave-softness) calc(7 * var(--wave-gap)) var(--board-cell-background),
+        0 0 var(--wave-softness) calc(7 * var(--wave-gap) + var(--wave-width)) var(--available-wave-color);
+    pointer-events: none;
+    position: absolute;
+    margin: auto;
+    inset: 0;
+    animation: available-wave 1.8s linear infinite;
+}
+
+.available-move .room::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle closest-side,
+        var(--board-cell-transparent) 0%,
+        var(--board-cell-transparent) 94%,
+        var(--board-cell-background) 100%);
+}
+
+@keyframes available-wave {
+    to {
+        width: calc(2 * var(--wave-gap) + var(--wave-origin));
+        height: calc(2 * var(--wave-gap) + var(--wave-origin));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .available-move .room::before {
+        animation: none;
+    }
 }
 
 .previous-move .piece[data-color] {
     box-shadow:
-        0 0 calc(1.25 * var(--vw)) rgba(255, 215, 0, 0.55),
-        inset 0 0 calc(0.5 * var(--vw)) rgba(255, 215, 0, 0.3);
+        0 0 calc(1.25 * var(--vw)) var(--previous-move-outer),
+        inset 0 0 calc(0.5 * var(--vw)) var(--previous-move-inner);
 }
 
 .last-move .piece[data-color] {
     box-shadow:
-        0 0 calc(2.5 * var(--vw)) rgba(255, 215, 0, 0.95),
-        0 0 calc(4 * var(--vw)) rgba(255, 140, 0, 0.65),
-        inset 0 0 calc(0.75 * var(--vw)) rgba(255, 255, 255, 0.55);
+        0 0 calc(2.5 * var(--vw)) var(--last-move-outer),
+        0 0 calc(4 * var(--vw)) var(--last-move-spread),
+        inset 0 0 calc(0.75 * var(--vw)) var(--last-move-inner);
 }
 
 .piece {
@@ -185,27 +251,89 @@ body>div {
     left: 0;
     bottom: 0;
     right: 0;
-    background-size: 100% 100%;
 }
 
-.piece[data-color="bn"] {
-    background-image: url(pieces/bn.png);
-    box-shadow: 0 0 calc(3 * var(--vw)) black;
+.piece[data-color],
+#side-piece[data-color] {
+    border-radius: 50%;
+    background-color: var(--piece-face);
+    background: radial-gradient(circle,
+        var(--piece-face) 0%,
+        var(--piece-face) 54%,
+        var(--piece-face-band) 56%,
+        var(--piece-face-band) 59%,
+        var(--piece-ring-inner) 61%,
+        var(--piece-ring-inner) 64%,
+        var(--piece-ring-outer) 66%,
+        var(--piece-ring-outer) 70%,
+        var(--piece-rim-inner) 72%,
+        var(--piece-rim-inner) 77%,
+        var(--piece-rim-outer) 79%,
+        var(--piece-rim-outer) 100%);
+    filter: drop-shadow(0 0 calc(0.65 * var(--vw)) var(--piece-shadow));
+    forced-color-adjust: none;
 }
 
-.piece[data-color="bq"] {
-    background-image: url(pieces/bq.png);
-    box-shadow: 0 0 calc(3 * var(--vw)) black;
+.piece[data-color^="b"],
+#side-piece[data-color^="b"] {
+    --piece-face: var(--dark-piece-face);
+    --piece-face-band: var(--dark-piece-face-band);
+    --piece-ring-inner: var(--dark-piece-ring-inner);
+    --piece-ring-outer: var(--dark-piece-ring-outer);
+    --piece-rim-inner: var(--dark-piece-rim-inner);
+    --piece-rim-outer: var(--dark-piece-rim-outer);
+    --piece-shadow: var(--dark-piece-shadow);
 }
 
-.piece[data-color="wn"] {
-    background-image: url(pieces/wn.png);
-    box-shadow: 0 0 calc(3 * var(--vw)) black;
+.piece[data-color^="w"],
+#side-piece[data-color^="w"] {
+    --piece-face: var(--light-piece-face);
+    --piece-face-band: var(--light-piece-face-band);
+    --piece-ring-inner: var(--light-piece-ring-inner);
+    --piece-ring-outer: var(--light-piece-ring-outer);
+    --piece-rim-inner: var(--light-piece-rim-inner);
+    --piece-rim-outer: var(--light-piece-rim-outer);
+    --piece-shadow: var(--light-piece-shadow);
 }
 
-.piece[data-color="wq"] {
-    background-image: url(pieces/wq.png);
-    box-shadow: 0 0 calc(3 * var(--vw)) black;
+.piece[data-color$="q"]::before,
+#side-piece[data-color$="q"]::before,
+.piece[data-color$="q"]::after,
+#side-piece[data-color$="q"]::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: drop-shadow(0 calc(0.08 * var(--vw)) calc(0.12 * var(--vw)) var(--queen-marker-edge));
+    opacity: 0.82;
+    pointer-events: none;
+}
+
+.piece[data-color$="q"]::before,
+#side-piece[data-color$="q"]::before {
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 18.5%,
+            var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%),
+        radial-gradient(circle at 77.6% 34.2%,
+            var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%),
+        radial-gradient(circle at 77.6% 65.8%,
+            var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%),
+        radial-gradient(circle at 50% 81.5%,
+            var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%),
+        radial-gradient(circle at 22.4% 65.8%,
+            var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%),
+        radial-gradient(circle at 22.4% 34.2%,
+            var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%);
+}
+
+.piece[data-color$="q"]::after,
+#side-piece[data-color$="q"]::after {
+    top: 18%;
+    left: 18%;
+    width: 64%;
+    height: 64%;
+    box-sizing: border-box;
+    border: max(3px, calc(0.35 * var(--vw))) solid var(--queen-crown-color);
 }
 
 .text {
@@ -217,9 +345,15 @@ body>div {
     justify-content: center;
     align-items: center;
     vertical-align: middle;
-    color: chocolate;
+    color: var(--move-order-color);
+    text-shadow:
+        -1px -1px 0 var(--move-order-shadow),
+        1px -1px 0 var(--move-order-shadow),
+        -1px 1px 0 var(--move-order-shadow),
+        1px 1px 0 var(--move-order-shadow);
     font-weight: bold;
-    font-family: monospace;
+    font-family: Arial, Helvetica, sans-serif;
+    font-variant-numeric: tabular-nums;
     position: absolute;
     margin: auto;
     top: 0;

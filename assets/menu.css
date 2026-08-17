@@ -4,6 +4,44 @@
     -webkit-user-select: none;
 }
 
+html, body
+{
+    min-height: 100%;
+    background: var(--page-background);
+    color: var(--text-color);
+}
+
+button, select
+{
+    border: 1px solid var(--strong-border-color);
+    border-radius: 0.35em;
+    background: var(--control-background);
+    color: var(--text-color);
+    font: inherit;
+}
+
+button:active
+{
+    background: var(--control-active-background);
+}
+
+button:disabled, input:disabled, select:disabled
+{
+    cursor: default;
+    opacity: 0.6;
+}
+
+button:focus-visible, select:focus-visible, input:focus-visible
+{
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+}
+
+input[type="checkbox"]
+{
+    accent-color: var(--accent-color);
+}
+
 body > div
 {
     text-align: center;
@@ -41,6 +79,22 @@ p, ul, ol
     width: 7em;
 }
 
+.save-error
+{
+    max-width: 28em;
+    box-sizing: border-box;
+    padding: 0.75em;
+    border: 1px solid var(--strong-border-color);
+    border-radius: 0.65em;
+    background: var(--control-active-background);
+    text-align: center;
+}
+
+.save-error[hidden]
+{
+    display: none;
+}
+
 .confirmation
 {
     position: fixed;
@@ -51,7 +105,7 @@ p, ul, ol
     justify-content: center;
     box-sizing: border-box;
     padding: 1em;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--modal-backdrop);
 }
 
 .confirmation[hidden]
@@ -65,10 +119,11 @@ p, ul, ol
     width: min(20em, calc(100vw - 2em));
     box-sizing: border-box;
     padding: 1em;
-    border: 1px solid black;
+    border: 1px solid var(--strong-border-color);
     border-radius: 0.65em;
-    background: white;
-    box-shadow: 0 0 1.5em black;
+    background: var(--surface-background);
+    color: var(--text-color);
+    box-shadow: var(--surface-shadow);
 }
 
 .confirmation-panel h3
