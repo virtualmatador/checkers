@@ -34,7 +34,7 @@ function setSaveVersionError(dataVersion, expectedVersion) {
     document.getElementById("save-data-version").textContent = dataVersion;
     document.getElementById("save-expected-version").textContent = expectedVersion;
     document.getElementById("save-version-error").hidden = false;
-    ["play", "difficulty", "alter", "rotate", "sound", "highlight", "thumb", "switch-sides"]
+    ["play", "difficulty", "theme", "alter", "rotate", "sound", "highlight", "thumb", "switch-sides"]
         .forEach(function(id) {
             document.getElementById(id).disabled = true;
         });
@@ -149,6 +149,12 @@ function setThumb(state) {
 
 function setHighlight(state) {
     document.getElementById("highlight").checked = state;
+}
+
+function themeChanged() {
+    var theme = document.getElementById("theme").value;
+    window.setThemePreference(theme);
+    CallHandler("theme", "change", theme);
 }
 
 function difficulty() {

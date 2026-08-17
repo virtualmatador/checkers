@@ -1,18 +1,18 @@
-*
-{
+* {
     user-select: none;
     -webkit-user-select: none;
 }
 
-html, body
-{
+html,
+body {
     min-height: 100%;
     background: var(--page-background);
     color: var(--text-color);
+    margin: 0;
 }
 
-button, select
-{
+button,
+select {
     border: 1px solid var(--strong-border-color);
     border-radius: 0.35em;
     background: var(--control-background);
@@ -20,67 +20,61 @@ button, select
     font: inherit;
 }
 
-button:active
-{
+button:active {
     background: var(--control-active-background);
 }
 
-button:disabled, input:disabled, select:disabled
-{
+button:disabled,
+input:disabled,
+select:disabled {
     cursor: default;
     opacity: 0.6;
 }
 
-button:focus-visible, select:focus-visible, input:focus-visible
-{
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
     outline: 2px solid var(--focus-color);
     outline-offset: 2px;
 }
 
-input[type="checkbox"]
-{
+input[type="checkbox"] {
     accent-color: var(--accent-color);
 }
 
-body > div
-{
+body>div {
     text-align: center;
 }
 
-body > div > div
-{
+body>div>div {
     display: inline-block;
 }
 
-h4
-{
+h4 {
     text-align: left;
 }
 
-p, ul, ol
-{
+p,
+ul,
+ol {
     text-align: left;
 }
 
-.controls
-{
+.controls {
     text-align: left;
 }
 
-.controls > *
-{
+.controls>* {
     font-size: 1em;
     margin-top: 6pt;
     margin-bottom: 6pt;
 }
 
-.controls > button
-{
+.controls>button {
     width: 7em;
 }
 
-.save-error
-{
+.save-error {
     max-width: 28em;
     box-sizing: border-box;
     padding: 0.75em;
@@ -90,13 +84,11 @@ p, ul, ol
     text-align: center;
 }
 
-.save-error[hidden]
-{
+.save-error[hidden] {
     display: none;
 }
 
-.confirmation
-{
+.confirmation {
     position: fixed;
     inset: 0;
     z-index: 1000;
@@ -108,13 +100,11 @@ p, ul, ol
     background: var(--modal-backdrop);
 }
 
-.confirmation[hidden]
-{
+.confirmation[hidden] {
     display: none;
 }
 
-.confirmation > .confirmation-panel
-{
+.confirmation>.confirmation-panel {
     display: block;
     width: min(20em, calc(100vw - 2em));
     box-sizing: border-box;
@@ -126,25 +116,21 @@ p, ul, ol
     box-shadow: var(--surface-shadow);
 }
 
-.confirmation-panel h3
-{
+.confirmation-panel h3 {
     margin-top: 0;
 }
 
-.confirmation-panel p
-{
+.confirmation-panel p {
     text-align: center;
 }
 
-.confirmation-actions
-{
+.confirmation-actions {
     display: flex;
     justify-content: center;
     gap: 0.75em;
 }
 
-.confirmation-actions button
-{
+.confirmation-actions button {
     min-width: 6em;
     padding: 0.5em;
 }

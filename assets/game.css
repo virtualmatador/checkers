@@ -154,7 +154,7 @@ body>div {
 .room {
     width: calc(50% * 1.4142 - (var(--vw) * 0.125));
     height: calc(50% * 1.4142 - (var(--vw) * 0.125));
-    border: calc(var(--vw) * 0.25) solid var(--board-border-color);
+    border: calc(var(--vw) * 0.3) solid var(--board-border-color);
     z-index: 100;
     background-color: var(--board-cell-background);
     position: absolute;
@@ -165,7 +165,6 @@ body>div {
     right: 0;
     transform: rotate(45deg);
     overflow: hidden;
-    forced-color-adjust: none;
 }
 
 .available-move .room::before {
@@ -208,9 +207,9 @@ body>div {
     position: absolute;
     inset: 0;
     background: radial-gradient(circle closest-side,
-        var(--board-cell-transparent) 0%,
-        var(--board-cell-transparent) 94%,
-        var(--board-cell-background) 100%);
+            var(--board-cell-transparent) 0%,
+            var(--board-cell-transparent) 94%,
+            var(--board-cell-background) 100%);
 }
 
 @keyframes available-wave {
@@ -227,16 +226,11 @@ body>div {
 }
 
 .previous-move .piece[data-color] {
-    box-shadow:
-        0 0 calc(1.25 * var(--vw)) var(--previous-move-outer),
-        inset 0 0 calc(0.5 * var(--vw)) var(--previous-move-inner);
+    box-shadow: 0 0 calc(2 * var(--vw)) var(--previous-last-move);
 }
 
 .last-move .piece[data-color] {
-    box-shadow:
-        0 0 calc(2.5 * var(--vw)) var(--last-move-outer),
-        0 0 calc(4 * var(--vw)) var(--last-move-spread),
-        inset 0 0 calc(0.75 * var(--vw)) var(--last-move-inner);
+    box-shadow: 0 0 calc(3 * var(--vw)) var(--previous-last-move);
 }
 
 .piece {
@@ -258,20 +252,18 @@ body>div {
     border-radius: 50%;
     background-color: var(--piece-face);
     background: radial-gradient(circle,
-        var(--piece-face) 0%,
-        var(--piece-face) 54%,
-        var(--piece-face-band) 56%,
-        var(--piece-face-band) 59%,
-        var(--piece-ring-inner) 61%,
-        var(--piece-ring-inner) 64%,
-        var(--piece-ring-outer) 66%,
-        var(--piece-ring-outer) 70%,
-        var(--piece-rim-inner) 72%,
-        var(--piece-rim-inner) 77%,
-        var(--piece-rim-outer) 79%,
-        var(--piece-rim-outer) 100%);
-    filter: drop-shadow(0 0 calc(0.65 * var(--vw)) var(--piece-shadow));
-    forced-color-adjust: none;
+            var(--piece-face) 0%,
+            var(--piece-face) 54%,
+            var(--piece-face-band) 56%,
+            var(--piece-face-band) 59%,
+            var(--piece-ring-inner) 61%,
+            var(--piece-ring-inner) 64%,
+            var(--piece-ring-outer) 66%,
+            var(--piece-ring-outer) 70%,
+            var(--piece-rim-inner) 72%,
+            var(--piece-rim-inner) 77%,
+            var(--piece-rim-outer) 79%,
+            var(--piece-rim-outer) 100%);
 }
 
 .piece[data-color^="b"],
@@ -297,19 +289,15 @@ body>div {
 }
 
 .piece[data-color$="q"]::before,
-#side-piece[data-color$="q"]::before,
-.piece[data-color$="q"]::after,
-#side-piece[data-color$="q"]::after {
+.piece[data-color$="q"]::after {
     content: "";
     position: absolute;
     border-radius: 50%;
-    filter: drop-shadow(0 calc(0.08 * var(--vw)) calc(0.12 * var(--vw)) var(--queen-marker-edge));
     opacity: 0.82;
     pointer-events: none;
 }
 
-.piece[data-color$="q"]::before,
-#side-piece[data-color$="q"]::before {
+.piece[data-color$="q"]::before {
     inset: 0;
     background:
         radial-gradient(circle at 50% 18.5%,
@@ -326,8 +314,7 @@ body>div {
             var(--queen-crown-color) 0%, var(--queen-crown-color) 4.3%, transparent 5%);
 }
 
-.piece[data-color$="q"]::after,
-#side-piece[data-color$="q"]::after {
+.piece[data-color$="q"]::after {
     top: 18%;
     left: 18%;
     width: 64%;

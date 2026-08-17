@@ -24,15 +24,24 @@ namespace main
         void switch_sides();
 
     private:
+        enum Theme
+        {
+            THEME_SYSTEM,
+            THEME_LIGHT,
+            THEME_DARK,
+            THEME_COUNT
+        };
+
         bool convert(int version, std::istream& input);
 
-        static constexpr int save_version_ = 1;
+        static constexpr int save_version_ = 2;
         int difficulty_;
         bool alter_;
         bool rotate_;
         bool sound_;
         bool thumb_;
         bool highlight_;
+        int theme_ = THEME_SYSTEM;
         int game_over_;
         int last_move_;
         int previous_move_;

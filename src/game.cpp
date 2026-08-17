@@ -19,7 +19,10 @@ main::Game::Game()
             return;
         else if (std::strcmp(command, "ready") == 0)
         {
-            bridge::CallFunction("setup();");
+            std::ostringstream js;
+            js << "window.setThemePreference(" << data_.theme_ << ");"
+               << "setup();";
+            bridge::CallFunction(js.str().c_str());
         }
         else if (std::strcmp(command, "setup") == 0)
         {

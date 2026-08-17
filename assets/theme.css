@@ -1,9 +1,9 @@
 :root {
-    color-scheme: light dark;
+    color-scheme: light;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: #ffffff;
     color: #0f172a;
-    --page-background: #ffffff;
+    --page-background: #c6cdc9;
     --surface-background: #ffffff;
     --control-background: #ffffff;
     --control-active-background: #e2e8f0;
@@ -44,48 +44,49 @@
     --light-piece-shadow: #020617;
     --queen-marker-edge: #111827;
     --queen-crown-color: #b48734;
-    --previous-move-outer: rgb(255 215 0 / 0.55);
-    --previous-move-inner: rgb(255 215 0 / 0.3);
-    --last-move-outer: rgb(255 215 0 / 0.95);
-    --last-move-spread: rgb(255 140 0 / 0.65);
-    --last-move-inner: rgb(255 255 255 / 0.55);
+    --previous-last-move: rgb(220 140 0 / 0.85);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        background: #020617;
-        color: #f8fafc;
-        --page-background: #020617;
-        --surface-background: #1f2937;
-        --control-background: #1e293b;
-        --control-active-background: #334155;
-        --border-color: #475569;
-        --strong-border-color: #94a3b8;
-        --text-color: #f8fafc;
-        --muted-text-color: #cbd5e1;
-        --focus-color: #60a5fa;
-        --accent-color: #7dd3fc;
-        --modal-backdrop: rgb(2 6 23 / 0.8);
-        --surface-shadow: 0 0.75rem 2rem rgb(0 0 0 / 0.55);
-        --danger-background: #991b1b;
-        --draw-background: #78350f;
-        --board-cell-background: #203a38;
-        --board-cell-transparent: rgb(32 58 56 / 0);
-        --available-wave-color: rgb(255 255 255 / 0.22);
-        --available-wave-dark-color: rgb(0 0 0 / 0.8);
-        --dark-piece-face: #6b7280;
-        --dark-piece-face-band: #374151;
-        --dark-piece-ring-inner: #d1d5db;
-        --dark-piece-ring-outer: #4b5563;
-        --dark-piece-rim-inner: #9ca3af;
-        --dark-piece-rim-outer: #374151;
-        --dark-piece-shadow: rgb(248 250 252 / 0.52);
-        --light-piece-face: #e2e8f0;
-        --light-piece-face-band: #ffffff;
-        --light-piece-ring-inner: #64748b;
-        --light-piece-ring-outer: #f8fafc;
-        --light-piece-rim-inner: #94a3b8;
-        --light-piece-rim-outer: #f8fafc;
-        --light-piece-shadow: #020617;
-    }
+:root:not([data-theme]) {
+    visibility: hidden;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    background: #020617;
+    color: #f8fafc;
+    --page-background: #020617;
+    --surface-background: #1f2937;
+    --control-background: #1e293b;
+    --control-active-background: #334155;
+    --border-color: #475569;
+    --strong-border-color: #94a3b8;
+    --text-color: #f8fafc;
+    --muted-text-color: #cbd5e1;
+    --focus-color: #60a5fa;
+    --accent-color: #7dd3fc;
+    --modal-backdrop: rgb(2 6 23 / 0.8);
+    --surface-shadow: 0 0.75rem 2rem rgb(0 0 0 / 0.55);
+    --danger-background: #991b1b;
+    --draw-background: #78350f;
+    --board-cell-background: #203a38;
+    --board-cell-transparent: rgb(32 58 56 / 0);
+    --available-wave-color: rgb(255 255 255 / 0.22);
+    --available-wave-dark-color: rgb(0 0 0 / 0.8);
+    --board-border-color: #040215;
+    --dark-piece-face: #6b7280;
+    --dark-piece-face-band: #374151;
+    --dark-piece-ring-inner: #d1d5db;
+    --dark-piece-ring-outer: #4b5563;
+    --dark-piece-rim-inner: #9ca3af;
+    --dark-piece-rim-outer: #374151;
+    --dark-piece-shadow: rgb(248 250 252 / 0.52);
+    --light-piece-face: #e2e8f0;
+    --light-piece-face-band: #ffffff;
+    --light-piece-ring-inner: #64748b;
+    --light-piece-ring-outer: #f8fafc;
+    --light-piece-rim-inner: #94a3b8;
+    --light-piece-rim-outer: #f8fafc;
+    --light-piece-shadow: #020617;
+    --previous-last-move: rgb(220 160 10 / 0.85);
 }

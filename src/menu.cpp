@@ -18,6 +18,10 @@ main::Menu::Menu()
             std::ostringstream js;
             js.str("");
             js.clear();
+            js << "window.setThemePreference(" << data_.theme_ << ");";
+            bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
             js << "setDifficulty(" << data_.difficulty_ << ");";
             bridge::CallFunction(js.str().c_str());
             js.str("");
@@ -53,6 +57,26 @@ main::Menu::Menu()
                    << Data::save_version_ << ");";
                 bridge::CallFunction(js.str().c_str());
             }
+        }
+    };
+    handlers_["theme"] = [&](const char *command, const char *info)
+    {
+        if (std::strcmp(command, "change") != 0 ||
+            data_.incompatible_save_)
+        {
+            return;
+        }
+        if (std::strcmp(info, "0") == 0)
+        {
+            data_.theme_ = Data::THEME_SYSTEM;
+        }
+        else if (std::strcmp(info, "1") == 0)
+        {
+            data_.theme_ = Data::THEME_LIGHT;
+        }
+        else if (std::strcmp(info, "2") == 0)
+        {
+            data_.theme_ = Data::THEME_DARK;
         }
     };
     handlers_["play"] = [&](const char *command, const char *info)

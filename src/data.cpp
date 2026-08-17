@@ -51,6 +51,7 @@ void main::Data::load(std::istream& input)
               >> loaded.sound_
               >> loaded.thumb_
               >> loaded.highlight_
+              >> loaded.theme_
               >> loaded.game_over_
               >> loaded.last_move_
               >> loaded.previous_move_
@@ -116,6 +117,7 @@ void main::Data::load(std::istream& input)
 
     valid = valid && loaded.difficulty_ >= 1 &&
         loaded.difficulty_ < static_cast<int>(Board::difficulty_limit_) &&
+        loaded.theme_ >= THEME_SYSTEM && loaded.theme_ < THEME_COUNT &&
         loaded.game_over_ >= 0 && loaded.game_over_ < 4 &&
         loaded.last_move_ >= -1 &&
         loaded.last_move_ < static_cast<int>(Board::cell_count_) &&
@@ -133,6 +135,7 @@ void main::Data::load(std::istream& input)
     sound_ = loaded.sound_;
     thumb_ = loaded.thumb_;
     highlight_ = loaded.highlight_;
+    theme_ = loaded.theme_;
     game_over_ = loaded.game_over_;
     last_move_ = loaded.last_move_;
     previous_move_ = loaded.previous_move_;
@@ -141,10 +144,110 @@ void main::Data::load(std::istream& input)
     incompatible_save_version_ = save_version_;
 }
 
-bool main::Data::convert(int version, std::istream&)
+bool main::Data::convert(int version, std::istream& input)
 {
     switch (version)
     {
+    case 1:
+    {
+        Data loaded;
+        int moves_count = 0;
+        bool valid = static_cast<bool>(
+            input >> loaded.difficulty_
+                  >> loaded.alter_
+                  >> loaded.rotate_
+                  >> loaded.sound_
+                  >> loaded.thumb_
+                  >> loaded.highlight_
+                  >> loaded.game_over_
+                  >> loaded.last_move_
+                  >> loaded.previous_move_
+                  >> moves_count);
+
+        valid = valid && moves_count >= 0 &&
+            moves_count <= static_cast<int>(Board::max_moves_);
+        for (int i = 0; valid && i < moves_count; ++i)
+        {
+            int move = 0;
+            valid = static_cast<bool>(input >> move) && move >= 0 &&
+                move < static_cast<int>(Board::cell_count_);
+            if (valid)
+            {
+                loaded.board_.moves_.emplace_back(
+                    static_cast<unsigned char>(move));
+            }
+        }
+
+        int level = 0;
+        if (valid)
+        {
+            valid = static_cast<bool>(input >> level) && level >= 0 &&
+                level < 2;
+            if (valid)
+            {
+                loaded.board_.level_ = static_cast<unsigned char>(level);
+            }
+        }
+
+        for (std::size_t i = 0; valid && i < Board::cell_count_; ++i)
+        {
+            bool value = false;
+            valid = static_cast<bool>(input >> value);
+            if (valid)
+            {
+                loaded.board_.fulls_.set(i, value);
+            }
+        }
+        for (std::size_t i = 0; valid && i < Board::cell_count_; ++i)
+        {
+            bool value = false;
+            valid = static_cast<bool>(input >> value);
+            if (valid)
+            {
+                loaded.board_.humans_.set(i, value);
+            }
+        }
+        for (std::size_t i = 0; valid && i < Board::cell_count_; ++i)
+        {
+            bool value = false;
+            valid = static_cast<bool>(input >> value);
+            if (valid)
+            {
+                loaded.board_.queens_.set(i, value);
+            }
+        }
+
+        if (valid)
+        {
+            input >> std::ws;
+            valid = input.eof() && !input.bad();
+        }
+
+        valid = valid && loaded.difficulty_ >= 1 &&
+            loaded.difficulty_ < static_cast<int>(Board::difficulty_limit_) &&
+            loaded.game_over_ >= 0 && loaded.game_over_ < 4 &&
+            loaded.last_move_ >= -1 &&
+            loaded.last_move_ < static_cast<int>(Board::cell_count_) &&
+            loaded.previous_move_ >= -1 &&
+            loaded.previous_move_ < static_cast<int>(Board::cell_count_);
+        if (!valid)
+        {
+            return false;
+        }
+
+        difficulty_ = loaded.difficulty_;
+        alter_ = loaded.alter_;
+        rotate_ = loaded.rotate_;
+        sound_ = loaded.sound_;
+        thumb_ = loaded.thumb_;
+        highlight_ = loaded.highlight_;
+        theme_ = loaded.theme_;
+        game_over_ = loaded.game_over_;
+        last_move_ = loaded.last_move_;
+        previous_move_ = loaded.previous_move_;
+        board_ = loaded.board_;
+        return true;
+    }
     default:
         return false;
     }
@@ -168,6 +271,7 @@ void main::Data::save(std::ostream& output) const
            << sound_ << '\n'
            << thumb_ << '\n'
            << highlight_ << '\n'
+           << theme_ << '\n'
            << game_over_ << '\n'
            << last_move_ << '\n'
            << previous_move_ << '\n'
@@ -201,6 +305,7 @@ void main::Data::reset_all()
     sound_ = false;
     thumb_ = false;
     highlight_ = false;
+    theme_ = THEME_SYSTEM;
     reset_game();
 }
 
